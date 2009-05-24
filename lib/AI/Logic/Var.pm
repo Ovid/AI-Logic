@@ -3,6 +3,11 @@ package AI::Logic::Var;
 use warnings;
 use strict;
 
+use base 'Exporter';
+our @EXPORT_OK = qw(
+    Var
+);
+
 =head1 NAME
 
 AI::Logic::Var - Logic variables
@@ -17,12 +22,17 @@ our $VERSION = '0.01';
 
 =head1 SYNOPSIS
 
-    use AI::Logic::Var;
+    use AI::Logic::Var 'Var';
 
-    my $var = AI::Logic::Var->new();
-    ...
+    my $thing = Var;
+    my $car   = Var('volkswagon');
 
 =cut 
+
+sub Var (;$) {
+    my $value = shift;
+    return return __PACKAGE__->new($value);
+}
 
 sub new {
     my ( $class, $value ) = @_;
