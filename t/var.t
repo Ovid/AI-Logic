@@ -3,20 +3,20 @@
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+use Test::Most 'no_plan';
 
-use aliased 'AI::Logic::Var';
+use AI::Logic::Var 'Var';
 
-my $v1 = Var->new;
-my $v2 = Var->new("hello");
-my $v3 = Var->new;
-my $v4 = Var->new("hello");
+my $v1 = Var;
+my $v2 = Var "hello";
+my $v3 = Var;
+my $v4 = Var "hello";
 
-isa_ok $v1, Var, 'new unbound var';
+isa_ok $v1, 'AI::Logic::Var', 'new unbound var';
 ok !$v1->bound, '  is not bound';
 is $v1->value, undef, '  and undefined';
 
-isa_ok $v2, Var, 'new bound var';
+isa_ok $v2, 'AI::Logic::Var', 'new bound var';
 ok $v2->bound, '  is bound';
 is $v2->value, "hello", '  to correct value';
 
