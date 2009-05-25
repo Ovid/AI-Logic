@@ -60,29 +60,12 @@ sub import {
     foreach my $predicate (@$predicates) {
         my ( $name, $arity ) = split /\// => $predicate;
         $database{$name}{$arity}{data} ||= [];
-        $database{$name}{unifier} = sub {
-            unless ( 'CODE' eq ref $_[-1] ) {
-                croak "Last argument to ($name) must be a code reference";
-            }
-            my $arity = @_ - 1;
-            if ( not exists $database{$name}{$arity} ) {
-                Carp::croak("Predicate $name/$arity not found in database");
-            }
-            else {
-                $database{$name}{$arity}{unification}->(@_);
-            }
-        };
+        $database{$name}{unifier} ||= _unifier( \%database, $name );
 
-        if ( not $installed{$name} ) {
+        no warnings 'numeric';
+        if ( not $installed{$name}++ ) {
             no strict 'refs';
-            *{"$callpack\::$name"} = sub {
-                my $arity = @_;
-                unless ( exists $database{$name}{$arity} ) {
-                    croak "Predicate $name/$arity not found in database";
-                }
-                push @{ $database{$name}{$arity}{data} } => [@_];    # XXX maybe Clone
-            };
-            $installed{$name} = 1;
+            *{"$callpack\::$name"} = _add_to_database(\%database, $name);
         }
         # XXX assert the name can be a function and that the arity is a
         # non-negative integer (what do foo/0 mean in this context?)
@@ -116,10 +99,57 @@ sub import {
     }
 }
 
+=head2 C<get_database($package)>
+
+This code will return the database defined in a given package.
+
+=cut
+
 sub get_database {
     my $name = shift;
     return $DATABASE{$name}
       or croak("No such database ($name)");
+}
+
+=head2 C<_add_to_database(\%database, $name)>
+
+This returns a code ref that will be exported to the database package to
+handle adding facts to the database;
+
+=cut
+
+sub _add_to_database {
+    my ( $database, $name ) = @_;
+    return sub {
+        my $arity = @_;
+        unless ( exists $database->{$name}{$arity} ) {
+            croak "Predicate $name/$arity not found in database";
+        }
+        push @{ $database->{$name}{$arity}{data} } => [@_];    # XXX maybe Clone
+    };
+}
+
+=head2 C<_unifier(\%database, $name)>
+
+This returns a code ref that will be exported to the target package to handle
+resolving facts and rules.  This is what the end consumer sees.
+
+=cut
+
+sub _unifier {
+    my ( $database, $name ) = @_;
+    return sub {
+        unless ( 'CODE' eq ref $_[-1] ) {
+            croak "Last argument to ($name) must be a code reference";
+        }
+        my $arity = @_ - 1;
+        if ( not exists $database->{$name}{$arity} ) {
+            Carp::croak("Predicate $name/$arity not found in database");
+        }
+        else {
+            $database->{$name}{$arity}{unification}->(@_);
+        }
+    };
 }
 
 =head1 AUTHOR
