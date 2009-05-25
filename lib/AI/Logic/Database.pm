@@ -60,6 +60,18 @@ sub import {
     foreach my $predicate (@$predicates) {
         my ( $name, $arity ) = split /\// => $predicate;
         $database{$name}{$arity}{data} ||= [];
+        $database{$name}{unifier} = sub {
+            unless ( 'CODE' eq ref $_[-1] ) {
+                croak "Last argument to ($name) must be a code reference";
+            }
+            my $arity = @_ - 1;
+            if ( not exists $database{$name}{$arity} ) {
+                Carp::croak("Predicate $name/$arity not found in database");
+            }
+            else {
+                $database{$name}{$arity}{unification}->(@_);
+            }
+        };
 
         if ( not $installed{$name} ) {
             no strict 'refs';

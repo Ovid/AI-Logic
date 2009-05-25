@@ -38,6 +38,7 @@ All functions are exportable on demand, or with the tag ':all'.
 
 sub unify {
     my ( $v1, $v2, $continuation ) = @_;
+
     $v1 = Var->new($v1) unless UNIVERSAL::isa( $v1, Var );
     $v2 = Var->new($v2) unless UNIVERSAL::isa( $v2, Var );
     if ( $v1->equal($v2) ) {

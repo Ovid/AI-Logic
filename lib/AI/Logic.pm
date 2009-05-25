@@ -3,6 +3,8 @@ package AI::Logic;
 use warnings;
 use strict;
 
+use Carp 'croak';
+
 use AI::Logic::Database ();
 
 =head1 NAME
@@ -17,13 +19,9 @@ Version 0.01
 
 our $VERSION = '0.01';
 
-
 =head1 SYNOPSIS
 
 =head1 EXPORT
-
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
 
 =cut
 
@@ -32,18 +30,9 @@ sub import {
     my $database = AI::Logic::Database::get_database($database_class);
 
     my $callpack = caller(0);
-    while ( my ( $name, $definition ) = each %$database) {
+    while ( my ( $name, $definition ) = each %$database ) {
         no strict 'refs';
-        *{"$callpack\::$name"} = sub {
-            my $continuation = pop @_;
-            my $arity        = @_;
-            if ( not exists $definition->{$arity} ) {
-                Carp::croak("Predicate $name/$arity not found in database");
-            }
-            else {
-                $definition->{$arity}{unification}->( @_, $continuation );
-            }
-        };
+        *{"$callpack\::$name"} = $definition->{unifier};
     }
 }
 
@@ -100,4 +89,4 @@ under the same terms as Perl itself.
 
 =cut
 
-1; # End of AI::Logic
+1;    # End of AI::Logic
