@@ -16,16 +16,16 @@ use Test::Most qw/no_plan/;
           married/2
           }
     ];
-    male('frank');
-    male('barney');
-    male('timothy');
-    male('ovid');
-    male('Sam');
-    female('Sarah');
-    female('Leila');
-    female('Samantha');
-    married( 'frank', 'Sarah' );
-    married( 'Sam',   'Samantha' );
+    male { 'frank' };
+    male { 'barney' };
+    male { 'timothy' };
+    male { 'ovid' };
+    male { 'Sam' };
+    female { 'Sarah' };
+    female { 'Leila' };
+    female { 'Samantha' };
+    married { 'frank', 'Sarah' };
+    married { 'Sam',   'Samantha' };
 }
 
 use AI::Logic 'My::Database';
@@ -73,6 +73,20 @@ my @wives;
 
 # wife(Person) :- married(_,Person), female(Person).
 # :- ( wife(Person), married(_,Person), female(Person) ).
+# Rule { 
+#     wife { Person }
+#     married { Any, Person }, 
+#     female { Person } 
+# };
+# sub wife {
+#     my ($Person, $continuation) = @_;
+#     married(
+#         Var, $Person,
+#         sub {
+#             female( $Person, $continuation );
+#         }
+#     );
+# }
 
 sub wife {
     my $var = shift;

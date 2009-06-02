@@ -11,14 +11,13 @@ $Data::Dumper::Sortkeys = 1;
 {
 
     package My::Database;
-    use AI::Logic::Database
-      predicates => [
+    use AI::Logic::Database predicates => [
         qw{
           male/1
           acts/1
           actor/2
           }
-      ];
+    ];
     male('frank');
     male('barney');
     male('timothy');
@@ -31,8 +30,10 @@ use AI::Logic::Var 'Var';
 
 my @names;
 foreach my $name (qw/frank judy barney/) {
-    male( $name, sub { push @names => $name;} );
+    male( $name, sub { push @names => $name; } );
 }
 print Dumper \@names;
 my $male = Var;
-male ($male, sub { print $male->value, $/ });
+male( $male, sub { print $male->value, $/ } );
+
+male( 1, 2, sub { } );

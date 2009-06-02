@@ -3,7 +3,7 @@ package AI::Logic::Unification;
 use warnings;
 use strict;
 
-use aliased 'AI::Logic::Var';
+use AI::Logic::Var 'Var';
 
 use base 'Exporter';
 our @EXPORT_OK = qw(
@@ -39,8 +39,8 @@ All functions are exportable on demand, or with the tag ':all'.
 sub unify {
     my ( $v1, $v2, $continuation ) = @_;
 
-    $v1 = Var->new($v1) unless UNIVERSAL::isa( $v1, Var );
-    $v2 = Var->new($v2) unless UNIVERSAL::isa( $v2, Var );
+    $v1 = Var $v1 unless UNIVERSAL::isa( $v1, 'AI::Logic::Var' );
+    $v2 = Var $v2 unless UNIVERSAL::isa( $v2, 'AI::Logic::Var' );
     if ( $v1->equal($v2) ) {
         $continuation->();
     }

@@ -60,13 +60,17 @@ sub import {
     foreach my $predicate (@$predicates) {
         my ( $name, $arity ) = split /\// => $predicate;
         $database{$name}{$arity}{data} ||= [];
+
+        # this creates the code which the end user will see.  We might break
+        # this down into unifier/arity, facts/arity and rules/arity
         $database{$name}{unifier} ||= _unifier( \%database, $name );
 
         no warnings 'numeric';
         if ( not $installed{$name}++ ) {
             no strict 'refs';
-            *{"$callpack\::$name"} = _add_to_database(\%database, $name);
+            *{"$callpack\::$name"} = _add_to_database( \%database, $name );
         }
+
         # XXX assert the name can be a function and that the arity is a
         # non-negative integer (what do foo/0 mean in this context?)
 
@@ -120,12 +124,13 @@ handle adding facts to the database;
 
 sub _add_to_database {
     my ( $database, $name ) = @_;
-    return sub {
-        my $arity = @_;
+    return sub (&) {
+        my @args = $_[0]->();
+        my $arity = @args;
         unless ( exists $database->{$name}{$arity} ) {
             croak "Predicate $name/$arity not found in database";
         }
-        push @{ $database->{$name}{$arity}{data} } => [@_];    # XXX maybe Clone
+        push @{ $database->{$name}{$arity}{data} } => [@args];    # XXX maybe Clone
     };
 }
 

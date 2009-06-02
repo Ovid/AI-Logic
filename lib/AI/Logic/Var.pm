@@ -24,8 +24,31 @@ our $VERSION = '0.01';
 
     use AI::Logic::Var 'Var';
 
-    my $thing = Var;
-    my $car   = Var('volkswagon');
+    my $any    = Var;
+    my $car    = Var('volkswagon');
+    my $cheese = Var 'Hasselhoff';
+
+=head1 FUNCTIONS
+
+To be defined later
+
+=over 4
+
+=item * C<Var>
+
+=item * C<new>
+
+=item * C<bind>
+
+=item * C<unbind>
+
+=item * C<equal>
+
+=item * C<bound>
+
+=item * C<value>
+
+=back
 
 =cut 
 

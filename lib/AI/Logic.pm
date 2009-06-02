@@ -9,7 +9,7 @@ use AI::Logic::Database ();
 
 =head1 NAME
 
-AI::Logic - The great new AI::Logic!
+AI::Logic - Continuation based logic programming.
 
 =head1 VERSION
 
