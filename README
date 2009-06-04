@@ -1,40 +1,44 @@
-AI-Logic
+NAME
+    AI::Logic - Continuation based logic programming.
 
-INSTALLATION
+VERSION
+    Version 0.01
 
-To install this module, run the following commands:
+SYNOPSIS
+EXPORT
+AUTHOR
+    Curtis "Ovid" Poe, "<ovid at cpan.org>"
 
-	perl Build.PL
-	./Build
-	./Build test
-	./Build install
+BUGS
+    Please report any bugs or feature requests to "bug-ai-logic at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=AI-Logic>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
 
-SUPPORT AND DOCUMENTATION
+SUPPORT
+    You can find documentation for this module with the perldoc command.
 
-After installing, you can find documentation for this module with the
-perldoc command.
+        perldoc AI::Logic
 
-    perldoc AI::Logic
+    You can also look for information at:
 
-You can also look for information at:
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=AI-Logic>
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=AI-Logic
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/AI-Logic>
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/AI-Logic
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/AI-Logic>
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/AI-Logic
+    * Search CPAN
+        <http://search.cpan.org/dist/AI-Logic/>
 
-    Search CPAN
-        http://search.cpan.org/dist/AI-Logic/
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Curtis "Ovid" Poe, all rights reserved.
 
-
-COPYRIGHT AND LICENCE
-
-Copyright (C) 2009 Curtis "Ovid" Poe
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
 

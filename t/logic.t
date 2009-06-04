@@ -9,13 +9,20 @@ use Test::Most qw/no_plan/;
 {
 
     package My::Database;
-    use AI::Logic::Database predicates => [
+    use AI::Logic::Database variables => [
+        qw/
+          Person
+          /
+      ],
+      predicates => [
         qw{
           male/1
           female/1
           married/2
+          wife/1
+          insane/1
           }
-    ];
+      ];
     male { 'frank' };
     male { 'barney' };
     male { 'timothy' };
@@ -24,12 +31,29 @@ use Test::Most qw/no_plan/;
     female { 'Sarah' };
     female { 'Leila' };
     female { 'Samantha' };
+    insane { 'frank' };
     married { 'frank', 'Sarah' };
     married { 'Sam',   'Samantha' };
+
+# wife(Person) :- married(_,Person), female(Person).
+# :- ( wife(Person), married(_,Person), female(Person) ).
+# sub wife {
+#     my ($Person, $continuation) = @_;
+#     married(
+#         Any, $Person,
+#         sub {
+#             female( $Person, $continuation );
+#         }
+#     );
+# }
+
+    Rule {
+        wife { Person } => married { Any, Person },
+          female { Person };
+    };
 }
 
 use AI::Logic 'My::Database';
-use AI::Logic::Var 'Var';
 
 throws_ok {
     male( 1, 2, sub { } );
@@ -69,38 +93,42 @@ married(
 eq_or_diff \@spouses, [ [qw/frank Sarah/], [qw/Sam Samantha/] ],
   '... and you should be able to search all records if the arity > 1';
 
+
 my @wives;
+#sub wife {
+#    my $var = shift;
+#    married(
+#        Var, $var,
+#        sub {
+#            female( $var, sub { push @wives => $var->value } );
+#        }
+#    );
+#}
 
-# wife(Person) :- married(_,Person), female(Person).
-# :- ( wife(Person), married(_,Person), female(Person) ).
-# Rule { 
-#     wife { Person }
-#     married { Any, Person }, 
-#     female { Person } 
-# };
-# sub wife {
-#     my ($Person, $continuation) = @_;
-#     married(
-#         Var, $Person,
-#         sub {
-#             female( $Person, $continuation );
-#         }
-#     );
-# }
-
-sub wife {
-    my $var = shift;
-    married(
-        Var, $var,
-        sub {
-            female( $var, sub { push @wives => $var->value } );
-        }
-    );
-}
-wife( Var 'Sarah' );
+my $var = Var 'Sarah';
+my $continuation = sub { push @wives, $var->value };
+wife( $var, $continuation );
 eq_or_diff \@wives, ['Sarah'], 'We should be able to match a head :- tail rule';
 
 @wives = ();
-wife(Var);
+$var = Var;
+wife($var,$continuation);
 eq_or_diff \@wives, [ 'Sarah', 'Samantha' ],
   'We should be able to match a head :- tail rule';
+
+sub strange_husband {
+    my ($person, $continuation) = @_;
+    insane(
+        $person,
+        sub {
+            married(
+                $person, Var,
+                sub {
+                    male( $person, $continuation );
+                }
+            );
+        }
+    );
+}
+$husband = Var;
+strange_husband($husband, sub { diag $husband->value });

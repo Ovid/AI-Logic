@@ -33,6 +33,8 @@ sub import {
     while ( my ( $name, $definition ) = each %$database ) {
         no strict 'refs';
         *{"$callpack\::$name"} = $definition->{unifier};
+        *{"$callpack\::Any"}   = sub () { AI::Logic::Var::Any->new };
+        *{"$callpack\::Var"}   = *AI::Logic::Var::Var{CODE};
     }
 }
 

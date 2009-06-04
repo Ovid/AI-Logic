@@ -7,6 +7,7 @@ use base 'Exporter';
 our @EXPORT_OK = qw(
     Var
 );
+@AI::Logic::Var::Any::ISA = 'AI::Logic::Var';
 
 =head1 NAME
 
