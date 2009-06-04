@@ -9,11 +9,7 @@ use Test::Most qw/no_plan/;
 {
 
     package My::Database;
-    use AI::Logic::Database variables => [
-        qw/
-          Person
-          /
-      ],
+    use AI::Logic::Database variables => [ qw/ Person / ],
       predicates => [
         qw{
           male/1
@@ -21,6 +17,7 @@ use Test::Most qw/no_plan/;
           married/2
           wife/1
           insane/1
+          person/1
           }
       ];
     male { 'frank' };
@@ -31,6 +28,8 @@ use Test::Most qw/no_plan/;
     female { 'Sarah' };
     female { 'Leila' };
     female { 'Samantha' };
+    Rule { person { Person } => male { Person } };
+    Rule { person { Person } => female { Person } };
     insane { 'frank' };
     married { 'frank', 'Sarah' };
     married { 'Sam',   'Samantha' };
@@ -132,3 +131,5 @@ sub strange_husband {
 }
 $husband = Var;
 strange_husband($husband, sub { diag $husband->value });
+person('frank', sub { diag "Frank is a person" });
+person('Leila', sub { diag "Leila is a person" });

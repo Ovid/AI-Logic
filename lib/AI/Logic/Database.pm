@@ -146,9 +146,12 @@ sub {
             END_RULE
             my $arity = @args;
 
-        # this is for delayed evaluation.  When the unifier hits this rule, it
-        # will be eval'ed against the target namespace and installed as a proper
-        # rule.  This only happens once.
+            # this is for delayed evaluation.  When the unifier hits this
+            # rule, it will be eval'ed against the target namespace and
+            # installed as a proper rule.  This only happens once.
+            # However, if we take reference to these, we can eval all of them
+            # in the import() function and skip the extra if{} check in the
+            # unifier.
             push @{ $database->{$name}{$arity}{fact_or_rule} } => $rule;
         }
     }

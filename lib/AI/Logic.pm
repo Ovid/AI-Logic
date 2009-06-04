@@ -21,6 +21,108 @@ our $VERSION = '0.01';
 
 =head1 SYNOPSIS
 
+ {
+     package My::Database;
+     use AI::Logic::Database variables => [ 'Person' ],
+       predicates => [
+         qw{
+           male/1
+           female/1
+           married/2
+           wife/1
+           insane/1
+           strange_husband/1
+           }
+       ];
+     male { 'frank' };
+     male { 'barney' };
+     male { 'timothy' };
+     male { 'ovid' };
+     male { 'Sam' };
+     female { 'Sarah' };
+     female { 'Leila' };
+     female { 'Samantha' };
+     married { 'frank', 'Sarah' };
+     married { 'Sam',   'Samantha' };
+     married { 'Bill', 'John' };
+ 
+     Rule {
+         wife { Person } => 
+           married { Any, Person },
+           female { Person };
+     };
+ }
+ 
+ use AI::Logic 'My::Database';
+ 
+ # Are any of these names known males?
+ my @names;
+ foreach my $name (qw/frank judy barney/) {
+     male( $name, sub { push @names => $name; } );
+ }
+ # @names will contain 'frank' and 'barney'
+ 
+ my $male = Var;
+ @names = ();
+ male( $male, sub { push @names => $male->value } );
+ # @names will contain all known males
+ 
+ # who is frank married to?
+ my $husband = Var 'frank';
+ my $wife    = Var;
+ married(
+     $husband, $wife,
+     sub {
+         print 'frank is married to '.$wife->value."\n";
+     }
+ );
+ 
+ # print all married couples
+ $husband->unbind;
+ $wife->unbind;
+ my @spouses;
+ married(
+     $husband, $wife,
+     sub {
+         print $husband->value .' is married to '.$wife->value."\n";
+     }
+ );
+ 
+ my $var = Var 'Sarah';
+ my $is_wife;
+ wife( $var, sub { $is_wife = 1 });
+ if ( $is_wife ) {
+     print "Yes\n";
+ }
+ else {
+     print "No\n";
+ }
+ 
+ # You can create rules on the fly, but it's not fun
+ sub strange_husband {
+     my ($person, $continuation) = @_;
+     insane(
+         $person,
+         sub {
+             married(
+                 $person, Var,
+                 sub {
+                     male( $person, $continuation );
+                 }
+             );
+         }
+     );
+ }
+ $husband = Var;
+ strange_husband($husband, sub { print $husband->value });
+ # equivalent to the following declaration in a database:
+ 
+ Rule {
+     strange_husband { Person } =>
+         insane { Person },
+         married { Person, Any }
+ }
+
 =head1 EXPORT
 
 =cut
