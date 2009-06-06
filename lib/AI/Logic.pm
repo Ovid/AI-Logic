@@ -98,14 +98,15 @@ our $VERSION = '0.01';
      print "No\n";
  }
  
- # You can create rules on the fly, but it's not fun
+ # You can create rules on the fly, but it's not fun and they'll conflict with
+ # other rules of the same name.
  sub strange_husband {
      my ($person, $continuation) = @_;
      insane(
          $person,
          sub {
              married(
-                 $person, Var,
+                 $person, Any,
                  sub {
                      male( $person, $continuation );
                  }
@@ -120,10 +121,31 @@ our $VERSION = '0.01';
  Rule {
      strange_husband { Person } =>
          insane { Person },
-         married { Person, Any }
+         married { Person, Any },
+         male { Person },
  }
 
 =head1 EXPORT
+
+The following functions are exported automatically:
+
+=over 4
+
+=item *C<Var>
+
+Used to declare logic variables.  These variables may be bound or unbound.
+
+ my $person = Var 'ovid';   # bound
+ my $person = Var;          # unbound
+
+=item * C<Any>
+
+Used to declare a logic variable whose value you do not care about.
+
+=back
+
+All predicates declared in your database will be exported as functions to your
+code.
 
 =cut
 
