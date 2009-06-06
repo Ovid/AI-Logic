@@ -19,6 +19,12 @@ Version 0.01
 
 our $VERSION = '0.01';
 
+=head1 ALPHA CODE
+
+Warning:  this is not yet documented or tested well.  I'm just making this
+publicly available because some folks wanted to see it.  It probably has lots
+of bugs.
+
 =head1 SYNOPSIS
 
  {

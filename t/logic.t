@@ -131,5 +131,5 @@ sub strange_husband {
 }
 $husband = Var;
 strange_husband($husband, sub { diag $husband->value });
-person('frank', sub { diag "Frank is a person" });
-person('Leila', sub { diag "Leila is a person" });
+person('frank', sub { explain "Frank is a person" });
+person('Leila', sub { explain "Leila is a person" });
