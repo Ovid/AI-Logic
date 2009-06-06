@@ -56,7 +56,7 @@ sub import {
             no strict 'refs';
 
             # is this enough?
-            my $var = Var;
+            my $var = AI::Logic::Var::Named->new( undef, $variable );
             *{"$callpack\::$variable"} = sub { $var };
             push @variables => $variable;
         }
@@ -163,10 +163,10 @@ sub _make_arg_list {
     my @variables;
     foreach my $arg (@args) {
         if ( UNIVERSAL::isa( $arg, 'AI::Logic::Var::Any' ) ) {
-            push @variables => 'AI::Logic::Var::Any->new()';
+            push @variables => '{PACKAGE}::Any()';
         }
-        elsif ( UNIVERSAL::isa( $arg, 'AI::Logic::Var' ) ) {
-            push @variables => '$v' . Scalar::Util::refaddr($arg);
+        elsif ( UNIVERSAL::isa( $arg, 'AI::Logic::Var::Named' ) ) {
+            push @variables => '$' . $arg->name;
         }
         else {
             push @variables => "'$arg'";
