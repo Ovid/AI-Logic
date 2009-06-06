@@ -58,20 +58,25 @@ sub Var (;$) {
     return return __PACKAGE__->new($value);
 }
 
+{
+    package AI::Logic::Var::Named;
+    our @ISA = 'AI::Logic::Var';
+    sub new {
+        my ( $class, $value, $name ) = @_;
+        bless [ $value, $name ] => $class;
+    }
+    
+    sub name { $_[0]->[1] }
+}
+
 sub new {
     my ( $class, $value ) = @_;
-    bless \\$value, $class;
+    bless [$value] => $class;
 }
 
-sub bound {
-    my $self = shift;
-    defined $$$self;
-}
+sub bound { defined $_[0]->[0] }
 
-sub value {
-    my $self = shift;
-    return ($$$self);
-}
+sub value { return $_[0]->[0] }
 
 sub equal {
     my ( $v1, $v2 ) = @_;
@@ -80,15 +85,12 @@ sub equal {
 
 sub bind {
     my ( $v1, $v2 ) = @_;
-    return (0) if $v1->bound;
-    $$v1 = $$v2;
-    return (1);
+    return if $v1->bound;
+    $v1->[0] = $v2->[0];
+    return 1;
 }
 
-sub unbind {
-    my $self = shift;
-    $$self = \undef;
-}
+sub unbind { $_[0]->[0] = undef; }
 
 =head1 AUTHOR
 
