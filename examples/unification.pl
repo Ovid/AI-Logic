@@ -14,19 +14,33 @@ $Data::Dumper::Sortkeys = 1;
     use AI::Logic::Database predicates => [
         qw{
           male/1
+          female/1
           acts/1
-          actor/2
-          }
-    ];
-    male('frank');
-    male('barney');
-    male('timothy');
-    male('ovid');
-    male('Sam');
+          actor/1
+          actress/1
+          },
+      ],
+      variables => ['Person'];
+    male { 'frank' };
+    male { 'barney' };
+    male { 'timothy' };
+    male { 'ovid' };
+    male { 'Sam' };
+    female { 'Sarah' };
+    acts { 'timothy' };
+    acts { 'barney' };
+    acts { 'Sarah' };
+    Rule {
+        actor { Person } => acts { Person },
+          male { Person };
+    };
+    Rule {
+        actress { Person } => acts { Person },
+          female { Person };
+    };
 }
 
 use AI::Logic 'My::Database';
-use AI::Logic::Var 'Var';
 
 my @names;
 foreach my $name (qw/frank judy barney/) {
@@ -34,6 +48,7 @@ foreach my $name (qw/frank judy barney/) {
 }
 print Dumper \@names;
 my $male = Var;
-male( $male, sub { print $male->value, $/ } );
+male( $male, sub { print $male->value .' is a male'.$/ } );
 
-male( 1, 2, sub { } );
+my $actor = Var;
+actor( $actor, sub { print $actor->value . ' is an actor', $/ } );

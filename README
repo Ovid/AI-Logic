@@ -4,8 +4,132 @@ NAME
 VERSION
     Version 0.01
 
+ALPHA CODE
+    Warning: this is not yet documented or tested well. I'm just making this
+    publicly available because some folks wanted to see it. It probably has
+    lots of bugs.
+
 SYNOPSIS
+     {
+         package My::Database;
+         use AI::Logic::Database variables => [ 'Person' ],
+           predicates => [
+             qw{
+               male/1
+               female/1
+               married/2
+               wife/1
+               insane/1
+               strange_husband/1
+               }
+           ];
+         male { 'frank' };
+         male { 'barney' };
+         male { 'timothy' };
+         male { 'ovid' };
+         male { 'Sam' };
+         female { 'Sarah' };
+         female { 'Leila' };
+         female { 'Samantha' };
+         married { 'frank', 'Sarah' };
+         married { 'Sam',   'Samantha' };
+         married { 'Bill', 'John' };
+ 
+         Rule {
+             wife { Person } => 
+               married { Any, Person },
+               female { Person };
+         };
+     }
+ 
+     use AI::Logic 'My::Database';
+ 
+     # Are any of these names known males?
+     my @names;
+     foreach my $name (qw/frank judy barney/) {
+         male( $name, sub { push @names => $name; } );
+     }
+     # @names will contain 'frank' and 'barney'
+ 
+     my $male = Var;
+     @names = ();
+     male( $male, sub { push @names => $male->value } );
+     # @names will contain all known males
+ 
+     # who is frank married to?
+     my $husband = Var 'frank';
+     my $wife    = Var;
+     married(
+         $husband, $wife,
+         sub {
+             print 'frank is married to '.$wife->value."\n";
+         }
+     );
+ 
+     # print all married couples
+     $husband->unbind;
+     $wife->unbind;
+     my @spouses;
+     married(
+         $husband, $wife,
+         sub {
+             print $husband->value .' is married to '.$wife->value."\n";
+         }
+     );
+ 
+     my $var = Var 'Sarah';
+     my $is_wife;
+     wife( $var, sub { $is_wife = 1 });
+     if ( $is_wife ) {
+         print "Yes\n";
+     }
+     else {
+         print "No\n";
+     }
+ 
+     # You can create rules on the fly, but it's not fun and they'll conflict with
+     # other rules of the same name.
+     sub strange_husband {
+         my ($person, $continuation) = @_;
+         insane(
+             $person,
+             sub {
+                 married(
+                     $person, Any,
+                     sub {
+                         male( $person, $continuation );
+                     }
+                 );
+             }
+         );
+     }
+     $husband = Var;
+     strange_husband($husband, sub { print $husband->value });
+     # equivalent to the following declaration in a database:
+ 
+     Rule {
+         strange_husband { Person } =>
+             insane { Person },
+             married { Person, Any },
+             male { Person },
+     }
+
 EXPORT
+    The following functions are exported automatically:
+
+    *"Var"
+        Used to declare logic variables. These variables may be bound or
+        unbound.
+
+         my $person = Var 'ovid';   # bound
+         my $person = Var;          # unbound
+
+    * "Any"
+        Used to declare a logic variable whose value you do not care about.
+
+    All predicates declared in your database will be exported as functions
+    to your code.
+
 AUTHOR
     Curtis "Ovid" Poe, "<ovid at cpan.org>"
 
