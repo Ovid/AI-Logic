@@ -224,9 +224,8 @@ This code will return the database defined in a given package.
 =cut
 
 sub get_database {
-    my $name = shift;
-    return $DATABASE{$name}
-      or croak("No such database ($name)");
+    my $name = shift // "";
+    return $DATABASE{$name};
 }
 
 =head2 C<_add_to_database(\%database, $name)>
