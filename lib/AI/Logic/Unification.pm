@@ -39,8 +39,33 @@ All functions are exportable on demand, or with the tag ':all'.
 sub unify {
     my ( $v1, $v2, $continuation ) = @_;
 
+    # Check for direct list unification before converting to Var objects
+    if (_both_lists($v1, $v2)) {
+        return _unify_lists($v1, $v2, $continuation);
+    }
+
+    # Handle variable-to-list binding
+    if (UNIVERSAL::isa($v1, 'AI::Logic::Var') && _is_list($v2)) {
+        if (!$v1->bound) {
+            $v1->[0] = $v2;  # Bind variable directly to list
+            $continuation->();
+            $v1->unbind;
+            return;
+        }
+    }
+    
+    if (UNIVERSAL::isa($v2, 'AI::Logic::Var') && _is_list($v1)) {
+        if (!$v2->bound) {
+            $v2->[0] = $v1;  # Bind variable directly to list
+            $continuation->();
+            $v2->unbind;
+            return;
+        }
+    }
+
     $v1 = Var $v1 unless UNIVERSAL::isa( $v1, 'AI::Logic::Var' );
     $v2 = Var $v2 unless UNIVERSAL::isa( $v2, 'AI::Logic::Var' );
+    
     if ( $v1->equal($v2) ) {
         $continuation->();
     }
@@ -96,6 +121,34 @@ Helper function to check if both values are list objects.
 sub _both_lists {
     my ($v1, $v2) = @_;
     return _is_list($v1) && _is_list($v2);
+}
+
+=head2 _unify_lists
+
+Recursive list unification function. Handles unification of two list objects
+by comparing their structure and recursively unifying heads and tails.
+
+=cut
+
+sub _unify_lists {
+    my ($list1, $list2, $continuation) = @_;
+    
+    # Both empty lists unify successfully
+    if ($list1->is_empty && $list2->is_empty) {
+        return $continuation->();
+    }
+    
+    # One empty, one not - unification fails
+    if ($list1->is_empty || $list2->is_empty) {
+        return;
+    }
+    
+    # Both non-empty: unify heads, then tails
+    unify($list1->head, $list2->head, sub {
+        unify($list1->tail, $list2->tail, $continuation);
+    });
+    
+    return;
 }
 
 
