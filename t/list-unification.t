@@ -11,8 +11,8 @@ use AI::Logic::Unification qw(unify);
 use AI::Logic::Var 'Var';
 
 subtest 'Empty list unification' => sub {
-    my $empty1 = AI::Logic::List->new();
-    my $empty2 = AI::Logic::List->new();
+    my $empty1 = Var([]);
+    my $empty2 = Var([]);
     
     my $unified = 0;
     unify($empty1, $empty2, sub { $unified = 1 });
@@ -21,8 +21,8 @@ subtest 'Empty list unification' => sub {
 };
 
 subtest 'Empty vs non-empty list unification' => sub {
-    my $empty = AI::Logic::List->new();
-    my $non_empty = AI::Logic::List->cons('a');
+    my $empty = Var([]);
+    my $non_empty = Var(['a']);
     
     my $unified = 0;
     unify($empty, $non_empty, sub { $unified = 1 });
@@ -37,8 +37,8 @@ subtest 'Empty vs non-empty list unification' => sub {
 };
 
 subtest 'Single element list unification' => sub {
-    my $list1 = AI::Logic::List->cons('a');
-    my $list2 = AI::Logic::List->cons('a');
+    my $list1 = Var(['a']);
+    my $list2 = Var(['a']);
     
     my $unified = 0;
     unify($list1, $list2, sub { $unified = 1 });
@@ -46,7 +46,7 @@ subtest 'Single element list unification' => sub {
     ok($unified, 'Single element lists with same element unify');
     
     # Test different elements
-    my $list3 = AI::Logic::List->cons('b');
+    my $list3 = Var(['b']);
     $unified = 0;
     unify($list1, $list3, sub { $unified = 1 });
     
@@ -54,12 +54,8 @@ subtest 'Single element list unification' => sub {
 };
 
 subtest 'Multi-element list unification' => sub {
-    my $list1 = AI::Logic::List->cons('a', 
-                    AI::Logic::List->cons('b', 
-                        AI::Logic::List->new()));
-    my $list2 = AI::Logic::List->cons('a', 
-                    AI::Logic::List->cons('b', 
-                        AI::Logic::List->new()));
+    my $list1 = Var(['a', 'b']);
+    my $list2 = Var(['a', 'b']);
     
     my $unified = 0;
     unify($list1, $list2, sub { $unified = 1 });
@@ -67,9 +63,7 @@ subtest 'Multi-element list unification' => sub {
     ok($unified, 'Multi-element lists with same structure unify');
     
     # Test different structure
-    my $list3 = AI::Logic::List->cons('a', 
-                    AI::Logic::List->cons('c', 
-                        AI::Logic::List->new()));
+    my $list3 = Var(['a', 'c']);
     $unified = 0;
     unify($list1, $list3, sub { $unified = 1 });
     
@@ -78,7 +72,7 @@ subtest 'Multi-element list unification' => sub {
 
 subtest 'List unification with variables' => sub {
     my $var = Var;  # Create unbound variable
-    my $list = AI::Logic::List->cons('a');
+    my $list = Var(['a']);
     
     my $unified = 0;
     my $was_bound = 0;
@@ -104,9 +98,7 @@ subtest 'List head/tail variable unification' => sub {
     my $var_list = AI::Logic::List->new($head_var, $tail_var);
     
     # Create concrete list to unify with
-    my $concrete_list = AI::Logic::List->cons('a', 
-                           AI::Logic::List->cons('b', 
-                               AI::Logic::List->new()));
+    my $concrete_list = Var(['a', 'b']);
     
     my $unified = 0;
     my ($head_was_bound, $tail_was_bound);
@@ -129,19 +121,8 @@ subtest 'List head/tail variable unification' => sub {
 
 subtest 'Nested list unification' => sub {
     # Create nested lists: [[a, b], c]
-    my $inner1 = AI::Logic::List->cons('a', 
-                     AI::Logic::List->cons('b', 
-                         AI::Logic::List->new()));
-    my $list1 = AI::Logic::List->cons($inner1, 
-                    AI::Logic::List->cons('c', 
-                        AI::Logic::List->new()));
-    
-    my $inner2 = AI::Logic::List->cons('a', 
-                     AI::Logic::List->cons('b', 
-                         AI::Logic::List->new()));
-    my $list2 = AI::Logic::List->cons($inner2, 
-                    AI::Logic::List->cons('c', 
-                        AI::Logic::List->new()));
+    my $list1 = Var([['a', 'b'], 'c']);
+    my $list2 = Var([['a', 'b'], 'c']);
     
     my $unified = 0;
     unify($list1, $list2, sub { $unified = 1 });
@@ -149,12 +130,7 @@ subtest 'Nested list unification' => sub {
     ok($unified, 'Nested lists with same structure unify');
     
     # Test different nested structure
-    my $inner3 = AI::Logic::List->cons('x', 
-                     AI::Logic::List->cons('y', 
-                         AI::Logic::List->new()));
-    my $list3 = AI::Logic::List->cons($inner3, 
-                    AI::Logic::List->cons('c', 
-                        AI::Logic::List->new()));
+    my $list3 = Var([['x', 'y'], 'c']);
     
     $unified = 0;
     unify($list1, $list3, sub { $unified = 1 });
@@ -163,10 +139,8 @@ subtest 'Nested list unification' => sub {
 };
 
 subtest 'Different length list unification' => sub {
-    my $short_list = AI::Logic::List->cons('a');
-    my $long_list = AI::Logic::List->cons('a', 
-                        AI::Logic::List->cons('b', 
-                            AI::Logic::List->new()));
+    my $short_list = Var(['a']);
+    my $long_list = Var(['a', 'b']);
     
     my $unified = 0;
     unify($short_list, $long_list, sub { $unified = 1 });

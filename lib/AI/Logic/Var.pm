@@ -2,6 +2,7 @@ package AI::Logic::Var;
 
 use warnings;
 use strict;
+use AI::Logic::List;
 
 use base 'Exporter';
 our @EXPORT_OK = qw(
@@ -28,6 +29,11 @@ our $VERSION = '0.01';
     my $any    = Var;
     my $car    = Var('volkswagon');
     my $cheese = Var 'Hasselhoff';
+    
+    # Create lists using array references
+    my $empty_list = Var([]);
+    my $colors = Var([qw/ red green blue /]);
+    my $nested = Var([1, [2, 3], 4]);
 
 =head1 FUNCTIONS
 
@@ -55,7 +61,39 @@ To be defined later
 
 sub Var (;$) {
     my $value = shift;
-    return return __PACKAGE__->new($value);
+    
+    # Convert array references to AI::Logic::List objects and return directly
+    if (defined $value && ref($value) eq 'ARRAY') {
+        return _array_to_list($value);
+    }
+    
+    return __PACKAGE__->new($value);
+}
+
+=head2 _array_to_list
+
+Helper function to convert Perl array references to AI::Logic::List objects.
+Converts [1, 2, 3] to a proper head/tail list structure.
+
+=cut
+
+sub _array_to_list {
+    my ($array_ref) = @_;
+    
+    # Empty array becomes empty list
+    return AI::Logic::List->new() if @$array_ref == 0;
+    
+    # Build list from right to left (tail to head)
+    my $list = AI::Logic::List->new();
+    for my $element (reverse @$array_ref) {
+        # Recursively convert nested arrays
+        if (ref($element) eq 'ARRAY') {
+            $element = _array_to_list($element);
+        }
+        $list = AI::Logic::List->cons($element, $list);
+    }
+    
+    return $list;
 }
 
 {
