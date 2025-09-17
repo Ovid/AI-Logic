@@ -50,10 +50,7 @@ sub import {
         no strict 'refs';
         *{"$callpack\::Rule"} = \&Rule;
         *{"$callpack\::Any"} = sub { AI::Logic::Var::Any->new };
-        # Only define List if it doesn't already exist
-        unless (defined &{"$callpack\::List"}) {
-            *{"$callpack\::List"} = sub { AI::Logic::List->new(@_) };
-        }
+        *{"$callpack\::Var"} = \&AI::Logic::Var::Var;
     }
     my @variables;
     if ( my $variables = delete $arg_for{variables} ) {
