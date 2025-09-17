@@ -1,0 +1,76 @@
+# Perl Module::Build generated files
+Build
+_build/
+Build.bat
+blib/
+
+# ExtUtils::MakeMaker generated files
+Makefile
+Makefile.old
+pm_to_blib
+
+# Distribution files
+AI-Logic-*
+*.tar.gz
+*.zip
+
+# Generated documentation
+README.bak
+META.yml
+META.json
+MYMETA.yml
+MYMETA.json
+
+# Backup and temporary files
+*~
+*.bak
+*.tmp
+*.swp
+*.swo
+.#*
+\#*#
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor files
+.vscode/
+.kiro/
+*.sublime-*
+.idea/
+
+# Perl specific
+*.o
+*.bs
+*.def
+*.exp
+
+# Test and development files
+cover_db/
+nytprof.out
+nytprof/
+*.prof
+
+# Log and error files
+*.log
+*.err
+errors.err
+
+# Development/working files (project specific)
+logic.pl
+test.pl
+test2.pl
+logic.txt
+MyDB.pm
+bak
+\
+
+# Kiro generated files (keep steering rules but ignore other generated content)
+.kiro/cache/
+.kiro/logs/
