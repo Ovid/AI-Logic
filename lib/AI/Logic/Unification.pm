@@ -76,6 +76,28 @@ sub unify_all {
     return (0);
 }
 
+=head2 _is_list
+
+Helper function to check if a value is a list object.
+
+=cut
+
+sub _is_list {
+    my ($value) = @_;
+    return UNIVERSAL::isa($value, 'AI::Logic::List');
+}
+
+=head2 _both_lists
+
+Helper function to check if both values are list objects.
+
+=cut
+
+sub _both_lists {
+    my ($v1, $v2) = @_;
+    return _is_list($v1) && _is_list($v2);
+}
+
 
 =head1 AUTHOR
 
