@@ -7,6 +7,7 @@ use Carp 'croak';
 use Scalar::Util;
 use AI::Logic::Var 'Var';
 use AI::Logic::Unification ':all';
+use AI::Logic::List;
 
 =head1 NAME
 
@@ -49,6 +50,10 @@ sub import {
         no strict 'refs';
         *{"$callpack\::Rule"} = \&Rule;
         *{"$callpack\::Any"} = sub { AI::Logic::Var::Any->new };
+        # Only define List if it doesn't already exist
+        unless (defined &{"$callpack\::List"}) {
+            *{"$callpack\::List"} = sub { AI::Logic::List->new(@_) };
+        }
     }
     my @variables;
     if ( my $variables = delete $arg_for{variables} ) {
@@ -168,11 +173,113 @@ sub _make_arg_list {
         elsif ( UNIVERSAL::isa( $arg, 'AI::Logic::Var::Named' ) ) {
             push @variables => '$' . $arg->name;
         }
+        elsif ( UNIVERSAL::isa( $arg, 'AI::Logic::List' ) ) {
+            push @variables => _serialize_list($arg);
+        }
+        elsif ( ref($arg) eq 'ARRAY' ) {
+            # Handle array reference as list syntax [a,b,c] or [Head|Tail]
+            push @variables => _parse_list_syntax($arg);
+        }
         else {
             push @variables => "'$arg'";
         }
     }
     return @variables;
+}
+
+sub _serialize_list {
+    my ($list) = @_;
+    
+    if ($list->is_empty()) {
+        return 'AI::Logic::List->new()';
+    }
+    
+    my $head = $list->head();
+    my $tail = $list->tail();
+    
+    # Serialize head
+    my $head_str;
+    if ( UNIVERSAL::isa( $head, 'AI::Logic::Var::Any' ) ) {
+        $head_str = '{PACKAGE}::Any()';
+    }
+    elsif ( UNIVERSAL::isa( $head, 'AI::Logic::Var::Named' ) ) {
+        $head_str = '{PACKAGE}::' . $head->name;
+    }
+    elsif ( UNIVERSAL::isa( $head, 'AI::Logic::List' ) ) {
+        $head_str = _serialize_list($head);
+    }
+    else {
+        $head_str = "'$head'";
+    }
+    
+    # Serialize tail
+    my $tail_str = _serialize_list($tail);
+    
+    return "AI::Logic::List->new($head_str, $tail_str)";
+}
+
+sub _parse_list_syntax {
+    my ($array_ref) = @_;
+    
+    # Handle empty list []
+    if (@$array_ref == 0) {
+        return 'AI::Logic::List->new()';
+    }
+    
+    # Check for head|tail pattern [Head|Tail]
+    # We'll use a special marker to detect this pattern
+    if (@$array_ref == 2 && ref($array_ref->[1]) eq 'SCALAR' && ${$array_ref->[1]} eq '|TAIL|') {
+        # This is [Head|Tail] pattern - Head is first element, Tail is the marker
+        my $head = $array_ref->[0];
+        my $head_str;
+        
+        if ( UNIVERSAL::isa( $head, 'AI::Logic::Var::Any' ) ) {
+            $head_str = '{PACKAGE}::Any()';
+        }
+        elsif ( UNIVERSAL::isa( $head, 'AI::Logic::Var::Named' ) ) {
+            $head_str = '{PACKAGE}::' . $head->name;
+        }
+        elsif ( UNIVERSAL::isa( $head, 'AI::Logic::List' ) ) {
+            $head_str = _serialize_list($head);
+        }
+        else {
+            $head_str = "'$head'";
+        }
+        
+        # For [Head|Tail] pattern, we need the tail variable name
+        # This is a limitation - we'll need to handle this differently
+        # For now, return a placeholder that can be processed later
+        return "AI::Logic::List->new($head_str, {TAIL_VAR})";
+    }
+    
+    # Handle regular list [a,b,c]
+    my $result = 'AI::Logic::List->new()';  # Start with empty list
+    
+    # Build list from right to left
+    for my $i (reverse 0..$#$array_ref) {
+        my $element = $array_ref->[$i];
+        my $element_str;
+        
+        if ( UNIVERSAL::isa( $element, 'AI::Logic::Var::Any' ) ) {
+            $element_str = '{PACKAGE}::Any()';
+        }
+        elsif ( UNIVERSAL::isa( $element, 'AI::Logic::Var::Named' ) ) {
+            $element_str = '{PACKAGE}::' . $element->name;
+        }
+        elsif ( UNIVERSAL::isa( $element, 'AI::Logic::List' ) ) {
+            $element_str = _serialize_list($element);
+        }
+        elsif ( ref($element) eq 'ARRAY' ) {
+            $element_str = _parse_list_syntax($element);
+        }
+        else {
+            $element_str = "'$element'";
+        }
+        
+        $result = "AI::Logic::List->new($element_str, $result)";
+    }
+    
+    return $result;
 }
 
 sub _internal_unifier {
