@@ -51,7 +51,7 @@ To be defined later
 
 =item * C<equal>
 
-=item * C<bound>
+=item * C<is_bound>
 
 =item * C<value>
 
@@ -112,13 +112,13 @@ sub new {
     bless [$value] => $class;
 }
 
-sub bound { defined $_[0]->[0] }
+sub is_bound { defined $_[0]->[0] }
 
 sub value { return $_[0]->[0] }
 
 sub equal {
     my ( $v1, $v2 ) = @_;
-    $v1 eq $v2 || $v1->bound && $v2->bound && $v1->value eq $v2->value;
+    $v1 eq $v2 || $v1->is_bound && $v2->is_bound && $v1->value eq $v2->value;
 }
 
 sub bind {
