@@ -48,13 +48,20 @@ an empty list. Called with head and tail creates a non-empty list.
 
 my $EMPTY_LIST = bless { head => undef, tail => undef }, __PACKAGE__;
 
-sub new ($class, $head = undef, $tail = undef) {
-    # Empty list if no head provided
-    if (!defined $head && !defined $tail) {
+# Don't use signatures here because we need a clean way to check number of args
+sub new {
+    # Empty list only if called with no arguments beyond class
+    if (@_ == 1) {
         return $EMPTY_LIST;
     }
     
-    # Non-empty list with head and tail
+    my ( $class, $head, $tail ) = @_;
+    # Empty list if both head and tail are explicitly undef AND we have exactly 3 args
+    if (@_ == 3 && !defined $head && !defined $tail) {
+        return $EMPTY_LIST;
+    }
+    
+    # Non-empty list with head and tail (head can be undef)
     return bless { 
         head => $head, 
         tail => $tail 
@@ -110,10 +117,35 @@ is provided, creates a list with the given head and an empty tail.
 =cut
 
 sub cons ($class, $head, $tail = undef) {
-    # If no tail provided, use empty list
-    $tail = $class->new() unless defined $tail;
+    # If no tail provided, use empty list singleton
+    $tail = $EMPTY_LIST unless defined $tail;
     
     return $class->new($head, $tail);
+}
+
+=head2 empty()
+
+Returns the singleton empty list.
+
+    my $empty = AI::Logic::List->empty();
+
+=cut
+
+sub empty ($class) {
+    return $EMPTY_LIST;
+}
+
+=head2 normalize()
+
+Returns the singleton empty list if this list is empty, otherwise returns self.
+This ensures that any operation that results in an empty list returns the singleton.
+
+    my $result = $some_list->normalize();
+
+=cut
+
+sub normalize ($self) {
+    return $self->is_empty() ? $EMPTY_LIST : $self;
 }
 
 =head1 AUTHOR
