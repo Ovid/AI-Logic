@@ -40,8 +40,7 @@ our $VERSION = '0.01';
 
 my %DATABASE;
 
-sub import {
-    my ( $class, %arg_for ) = @_;
+sub import ($class, %arg_for) {
 
     # XXX assert that values are arrays
     my $callpack = caller(0);
@@ -113,9 +112,9 @@ sub import {
 #         sub { female( $Person, $continuation ) }
 #     );
 # }
-sub Rule :prototype(&) {
+sub Rule :prototype(&) ($coderef) {
     local $ENV{CREATING_RULE} = 1;
-    my @rules = shift->() or return;
+    my @rules = $coderef->() or return;
 
     unless ( @rules > 1 ) {
         croak "Rules must have both a head and a tail";
@@ -161,8 +160,7 @@ sub {
     return;
 }
 
-sub _make_arg_list {
-    my @args = @_;
+sub _make_arg_list (@args) {
     my @variables;
     foreach my $arg (@args) {
         if ( $arg isa 'AI::Logic::Var::Any' ) {
@@ -185,8 +183,7 @@ sub _make_arg_list {
     return @variables;
 }
 
-sub _serialize_list {
-    my ($list) = @_;
+sub _serialize_list ($list) {
     
     if ($list->is_empty()) {
         return 'AI::Logic::List->new()';
@@ -216,8 +213,7 @@ sub _serialize_list {
     return "AI::Logic::List->new($head_str, $tail_str)";
 }
 
-sub _parse_list_syntax {
-    my ($array_ref) = @_;
+sub _parse_list_syntax ($array_ref) {
     
     # Handle empty list []
     if (@$array_ref == 0) {
@@ -280,8 +276,7 @@ sub _parse_list_syntax {
     return $result;
 }
 
-sub _internal_unifier {
-    my ( $database, $name, $arity ) = @_;
+sub _internal_unifier ($database, $name, $arity) {
     return sub {
         local *__ANON__ = '__ANON__internal_unifier';
         my $continuation = pop @_;
@@ -328,8 +323,7 @@ This code will return the database defined in a given package.
 
 =cut
 
-sub get_database {
-    my $name = shift // "";
+sub get_database ($name //= "") {
     return $DATABASE{$name};
 }
 
@@ -340,8 +334,7 @@ handle adding facts to the database;
 
 =cut
 
-sub _add_to_database {
-    my ( $database, $name ) = @_;
+sub _add_to_database ($database, $name) {
     return sub :prototype(&) {
         if ( $ENV{CREATING_RULE} ) {
             return _add_rule_to_database( $database, $name, shift );
@@ -356,8 +349,7 @@ sub _add_to_database {
     };
 }
 
-sub _add_rule_to_database {
-    my ( $database, $name, $coderef ) = @_;
+sub _add_rule_to_database ($database, $name, $coderef) {
     return [ $database, $name, $coderef->() ];
 }
 
@@ -368,8 +360,7 @@ resolving facts and rules.  This is what the end consumer sees.
 
 =cut
 
-sub _end_user_unifier {
-    my ( $database, $name ) = @_;
+sub _end_user_unifier ($database, $name) {
     return sub {
         my $continuation = $_[-1];
         my $arity        = @_ - 1;

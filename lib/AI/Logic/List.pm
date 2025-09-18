@@ -46,11 +46,9 @@ an empty list. Called with head and tail creates a non-empty list.
 
 =cut
 
-sub new {
-    my ($class, $head, $tail) = @_;
-    
-    # Empty list if no arguments provided
-    if (@_ == 1) {
+sub new ($class, $head = undef, $tail = undef) {
+    # Empty list if no head provided
+    if (!defined $head) {
         return bless { head => undef, tail => undef }, $class;
     }
     
@@ -69,8 +67,7 @@ Returns the head (first element) of the list. Returns undef for empty lists.
 
 =cut
 
-sub head {
-    my ($self) = @_;
+sub head ($self) {
     return $self->{head};
 }
 
@@ -82,8 +79,7 @@ Returns the tail (rest of the list) of the list. Returns undef for empty lists.
 
 =cut
 
-sub tail {
-    my ($self) = @_;
+sub tail ($self) {
     return $self->{tail};
 }
 
@@ -97,8 +93,7 @@ Returns true if the list is empty (both head and tail are undefined).
 
 =cut
 
-sub is_empty {
-    my ($self) = @_;
+sub is_empty ($self) {
     return !defined($self->{head}) && !defined($self->{tail});
 }
 
@@ -112,9 +107,7 @@ is provided, creates a list with the given head and an empty tail.
 
 =cut
 
-sub cons {
-    my ($class, $head, $tail) = @_;
-    
+sub cons ($class, $head, $tail = undef) {
     # If no tail provided, use empty list
     $tail = $class->new() unless defined $tail;
     

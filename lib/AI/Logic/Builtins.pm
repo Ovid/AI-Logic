@@ -55,8 +55,7 @@ Registers all built-in predicates with the specified database package.
 
 =cut
 
-sub register_builtins {
-    my ($database_package) = @_;
+sub register_builtins ($database_package) {
     
     # This would copy the builtin predicates to the target database
     # For now, we'll implement this as needed

@@ -35,8 +35,7 @@ All functions are exportable on demand, or with the tag ':all'.
 
 =cut
 
-sub unify {
-    my ( $v1, $v2, $continuation ) = @_;
+sub unify ($v1, $v2, $continuation) {
 
     # Check for direct list unification before converting to Var objects
     if (_both_lists($v1, $v2)) {
@@ -86,8 +85,7 @@ sub unify {
 
 =cut
 
-sub unify_all {
-    my ( $a, $b, $continuation ) = @_;
+sub unify_all ($a, $b, $continuation) {
     if ( @$a == 0 && @$b == 0 ) {
         $continuation->();
     }
@@ -106,8 +104,7 @@ Helper function to check if a value is a list object.
 
 =cut
 
-sub _is_list {
-    my ($value) = @_;
+sub _is_list ($value) {
     return $value isa 'AI::Logic::List';
 }
 
@@ -117,8 +114,7 @@ Helper function to check if both values are list objects.
 
 =cut
 
-sub _both_lists {
-    my ($v1, $v2) = @_;
+sub _both_lists ($v1, $v2) {
     return _is_list($v1) && _is_list($v2);
 }
 
@@ -129,8 +125,7 @@ by comparing their structure and recursively unifying heads and tails.
 
 =cut
 
-sub _unify_lists {
-    my ($list1, $list2, $continuation) = @_;
+sub _unify_lists ($list1, $list2, $continuation) {
     
     # Both empty lists unify successfully
     if ($list1->is_empty && $list2->is_empty) {

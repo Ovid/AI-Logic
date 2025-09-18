@@ -1,7 +1,6 @@
 package AI::Logic::Var;
 
 use v5.40.0;
-no feature 'signatures';
 use AI::Logic::List;
 
 use base 'Exporter';
@@ -59,8 +58,7 @@ To be defined later
 
 =cut 
 
-sub Var (;$) {
-    my $value = shift;
+sub Var ($value = undef) {
     
     # Convert array references to AI::Logic::List objects and return directly
     if (defined $value && ref($value) eq 'ARRAY') {
@@ -77,8 +75,7 @@ Converts [1, 2, 3] to a proper head/tail list structure.
 
 =cut
 
-sub _array_to_list {
-    my ($array_ref) = @_;
+sub _array_to_list ($array_ref) {
     
     # Empty array becomes empty list
     return AI::Logic::List->new() if @$array_ref == 0;
@@ -99,36 +96,32 @@ sub _array_to_list {
 {
     package AI::Logic::Var::Named;
     our @ISA = 'AI::Logic::Var';
-    sub new {
-        my ( $class, $value, $name ) = @_;
+    sub new ($class, $value, $name) {
         bless [ $value, $name ] => $class;
     }
     
-    sub name { $_[0]->[1] }
+    sub name ($self) { $self->[1] }
 }
 
-sub new {
-    my ( $class, $value ) = @_;
+sub new ($class, $value = undef) {
     bless [$value] => $class;
 }
 
-sub is_bound { defined $_[0]->[0] }
+sub is_bound ($self) { defined $self->[0] }
 
-sub value { return $_[0]->[0] }
+sub value ($self) { return $self->[0] }
 
-sub equals {
-    my ( $v1, $v2 ) = @_;
+sub equals ($v1, $v2) {
     $v1 eq $v2 || $v1->is_bound && $v2->is_bound && $v1->value eq $v2->value;
 }
 
-sub bind {
-    my ( $v1, $v2 ) = @_;
+sub bind ($v1, $v2) {
     return if $v1->is_bound;
     $v1->[0] = $v2->[0];
     return 1;
 }
 
-sub unbind { $_[0]->[0] = undef; }
+sub unbind ($self) { $self->[0] = undef; }
 
 =head1 AUTHOR
 
