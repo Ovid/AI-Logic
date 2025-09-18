@@ -26,14 +26,14 @@ our $VERSION = '0.01';
  use AI::Logic::Database
    variables  => qw(PERSON),
    predicates => qw(
-   male/1
-   acts/1
-   actor/2
+   developer/1
+   works_on/2
+   skill/2
  );
  AI::Logic::Database->add_to_database(
-     male('frank');
-     male('barney');
-     acts('frank');
+     developer('yuki');
+     developer('adeyemi');
+     works_on('yuki', 'web_app');
  );
 
 =cut 
@@ -101,15 +101,15 @@ sub import ($class, %arg_for) {
 }
 
 # @rules = (
-#  [ 'wife', Person ],
-#  [ 'married', Any, Person ],
-#  [ 'female', Person ]
+#  [ 'team_lead', Person ],
+#  [ 'mentor', Person, Any ],
+#  [ 'developer', Person ]
 #);
-# sub wife {
+# sub team_lead {
 #     my ($Person, $continuation) = @_;
-#     married(
-#         Any, $Person,
-#         sub { female( $Person, $continuation ) }
+#     mentor(
+#         $Person, Any,
+#         sub { developer( $Person, $continuation ) }
 #     );
 # }
 sub Rule :prototype(&) ($coderef) {

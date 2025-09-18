@@ -14,67 +14,75 @@ use AI::Logic::TestDatabase;
 # Import the test database to use its predicates
 use AI::Logic 'AI::Logic::TestDatabase';
 
-subtest 'Regular predicates work correctly' => sub {
-    # Test male/1 predicate
-    my @males;
-    my $male_var = Var();
-    male($male_var, sub { push @males, $male_var->value });
-    is_deeply([sort @males], [sort qw(frank barney timothy sam)], 
-              'All males found correctly');
+subtest 'Team predicates work correctly' => sub {
+    # Test developer/1 predicate
+    my @developers;
+    my $dev_var = Var();
+    developer($dev_var, sub { push @developers, $dev_var->value });
+    is_deeply([sort @developers], [sort qw(yuki adeyemi priya carlos fatima erik aisha dmitri)], 
+              'All developers found correctly');
     
-    # Test female/1 predicate
-    my @females;
-    my $female_var = Var();
-    female($female_var, sub { push @females, $female_var->value });
-    is_deeply([sort @females], [sort qw(sarah leila samantha betty)], 
-              'All females found correctly');
+    # Test designer/1 predicate
+    my @designers;
+    my $designer_var = Var();
+    designer($designer_var, sub { push @designers, $designer_var->value });
+    is_deeply([sort @designers], [sort qw(kenji zara maya)], 
+              'All designers found correctly');
     
-    # Test married/2 predicate
-    my @married_couples;
-    my $husband = Var();
-    my $wife = Var();
-    married($husband, $wife, sub {
-        push @married_couples, [$husband->value, $wife->value];
+    # Test manager/1 predicate
+    my @managers;
+    my $manager_var = Var();
+    manager($manager_var, sub { push @managers, $manager_var->value });
+    is_deeply([sort @managers], [sort qw(amara hassan ling)], 
+              'All managers found correctly');
+    
+    # Test works_on/2 predicate
+    my @work_assignments;
+    my $person_var = Var();
+    my $project_var = Var();
+    works_on($person_var, $project_var, sub {
+        push @work_assignments, [$person_var->value, $project_var->value];
     });
-    is_deeply([sort { $a->[0] cmp $b->[0] } @married_couples],
-              [sort { $a->[0] cmp $b->[0] } (
-                  ['frank', 'sarah'],
-                  ['barney', 'betty'], 
-                  ['sam', 'samantha']
-              )],
-              'All married couples found correctly');
-    
-    # Test parent/2 predicate
-    my @parent_child;
-    my $parent_var = Var();
-    my $child_var = Var();
-    parent($parent_var, $child_var, sub {
-        push @parent_child, [$parent_var->value, $child_var->value];
-    });
-    is_deeply([sort { $a->[0] cmp $b->[0] || $a->[1] cmp $b->[1] } @parent_child],
+    is_deeply([sort { $a->[0] cmp $b->[0] || $a->[1] cmp $b->[1] } @work_assignments],
               [sort { $a->[0] cmp $b->[0] || $a->[1] cmp $b->[1] } (
-                  ['frank', 'timothy'],
-                  ['sarah', 'timothy'],
-                  ['barney', 'sam'],
-                  ['betty', 'sam']
+                  ['yuki', 'web_app'],
+                  ['adeyemi', 'mobile_app'],
+                  ['priya', 'api_service'],
+                  ['carlos', 'data_pipeline'],
+                  ['fatima', 'web_app'],
+                  ['erik', 'mobile_app']
               )],
-              'All parent-child relationships found correctly');
+              'All work assignments found correctly');
     
-    # Test child/2 rule (inverse of parent)
-    my @child_parent;
-    $child_var = Var();
-    $parent_var = Var();
-    child($child_var, $parent_var, sub {
-        push @child_parent, [$child_var->value, $parent_var->value];
+    # Test mentor/2 predicate
+    my @mentoring;
+    my $mentor_var = Var();
+    my $mentee_var = Var();
+    mentor($mentor_var, $mentee_var, sub {
+        push @mentoring, [$mentor_var->value, $mentee_var->value];
     });
-    is_deeply([sort { $a->[0] cmp $b->[0] || $a->[1] cmp $b->[1] } @child_parent],
+    is_deeply([sort { $a->[0] cmp $b->[0] || $a->[1] cmp $b->[1] } @mentoring],
               [sort { $a->[0] cmp $b->[0] || $a->[1] cmp $b->[1] } (
-                  ['timothy', 'frank'],
-                  ['timothy', 'sarah'],
-                  ['sam', 'barney'],
-                  ['sam', 'betty']
+                  ['carlos', 'yuki'],
+                  ['fatima', 'adeyemi'],
+                  ['erik', 'priya'],
+                  ['amara', 'kenji']
               )],
-              'Child rule works correctly (inverse of parent)');
+              'All mentoring relationships found correctly');
+    
+    # Test skill/2 predicate
+    my @skills;
+    my $skill_person = Var();
+    my $skill_name = Var();
+    skill($skill_person, $skill_name, sub {
+        push @skills, [$skill_person->value, $skill_name->value];
+    });
+    ok(@skills > 0, 'Skills found correctly');
+    
+    # Check specific skill
+    my $yuki_has_js = 0;
+    skill(Var('yuki'), Var('javascript'), sub { $yuki_has_js = 1 });
+    ok($yuki_has_js, 'Yuki has JavaScript skill');
 };
 
 subtest 'List predicates are callable but not implemented' => sub {
@@ -114,19 +122,19 @@ subtest 'List predicates are callable but not implemented' => sub {
 
 subtest 'Mixed variable types work together' => sub {
     # Test that we can create and use different variable types
-    my $person = Var('frank');
-    my $list_of_names = Var(['frank', 'sarah', 'timothy']);
+    my $person = Var('yuki');
+    my $list_of_names = Var(['yuki', 'adeyemi', 'priya']);
     my $empty_list = Var([]);
     
-    # Verify the person is male
-    my $is_male = 0;
-    male($person, sub { $is_male = 1 });
-    ok($is_male, 'Frank is correctly identified as male');
+    # Verify the person is a developer
+    my $is_developer = 0;
+    developer($person, sub { $is_developer = 1 });
+    ok($is_developer, 'Yuki is correctly identified as developer');
     
     # Test list variable properties
     isa_ok($list_of_names, 'AI::Logic::List', 'List of names is a List object');
-    is($list_of_names->head(), 'frank', 'List head is correct');
-    is($list_of_names->tail()->head(), 'sarah', 'List tail head is correct');
+    is($list_of_names->head(), 'yuki', 'List head is correct');
+    is($list_of_names->tail()->head(), 'adeyemi', 'List tail head is correct');
     
     isa_ok($empty_list, 'AI::Logic::List', 'Empty list is a List object');
     ok($empty_list->is_empty(), 'Empty list is correctly empty');
@@ -144,13 +152,13 @@ subtest 'Mixed variable types work together' => sub {
     ok(!$unbound_var->is_bound(), 'Unbound variable is not bound');
 };
 
-subtest 'Database supports both regular and list predicate queries' => sub {
+subtest 'Database supports both team and list predicate queries' => sub {
     # Test that we can query both types of predicates in the same session
     
-    # Query regular predicates
-    my $frank_is_male = 0;
-    male(Var('frank'), sub { $frank_is_male = 1 });
-    ok($frank_is_male, 'Can query regular predicates');
+    # Query team predicates
+    my $yuki_is_developer = 0;
+    developer(Var('yuki'), sub { $yuki_is_developer = 1 });
+    ok($yuki_is_developer, 'Can query team predicates');
     
     # Attempt to query list predicates (they should be callable but not succeed)
     my $append_called = 0;
@@ -161,7 +169,7 @@ subtest 'Database supports both regular and list predicate queries' => sub {
     is($append_called, 0, 'List predicates do not succeed (no implementation yet)');
     
     # Test that both types of predicates exist in the same namespace
-    ok(defined &male, 'Regular predicate function exists');
+    ok(defined &developer, 'Team predicate function exists');
     ok(defined &Append, 'List predicate function exists');
     ok(defined &Var, 'Var constructor exists');
     ok(defined &Any, 'Any constructor exists');

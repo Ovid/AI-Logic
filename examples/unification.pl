@@ -13,42 +13,61 @@ $Data::Dumper::Sortkeys = 1;
     package My::Database;
     use AI::Logic::Database predicates => [
         qw{
-          male/1
-          female/1
-          acts/1
-          actor/1
-          actress/1
+          developer/1
+          designer/1
+          works_on/2
+          skill/2
+          team_member/2
+          mentor/2
           },
       ],
-      variables => ['Person'];
-    male { 'frank' };
-    male { 'barney' };
-    male { 'timothy' };
-    male { 'ovid' };
-    male { 'Sam' };
-    female { 'Sarah' };
-    acts { 'timothy' };
-    acts { 'barney' };
-    acts { 'Sarah' };
+      variables => ['Person', 'Project', 'Skill'];
+    
+    # Diverse team members
+    developer { 'yuki' };      # Japanese
+    developer { 'adeyemi' };   # Yoruba/Nigerian
+    developer { 'priya' };     # Sanskrit/Indian
+    developer { 'carlos' };    # Spanish/Latin American
+    designer { 'kenji' };      # Japanese
+    designer { 'zara' };       # Arabic/Hebrew
+    
+    # Work assignments
+    works_on { 'yuki', 'web_app' };
+    works_on { 'adeyemi', 'mobile_app' };
+    works_on { 'priya', 'api_service' };
+    
+    # Skills
+    skill { 'yuki', 'javascript' };
+    skill { 'adeyemi', 'python' };
+    skill { 'priya', 'rust' };
+    
+    # Team memberships
+    team_member { 'yuki', 'frontend' };
+    team_member { 'adeyemi', 'backend' };
+    team_member { 'priya', 'backend' };
+    
+    # Mentoring
+    mentor { 'carlos', 'yuki' };
+    
     Rule {
-        actor { Person } => acts { Person },
-          male { Person };
-    };
-    Rule {
-        actress { Person } => acts { Person },
-          female { Person };
+        full_stack { Person } => 
+          skill { Person, 'javascript' },
+          skill { Person, 'python' };
     };
 }
 
 use AI::Logic 'My::Database';
 
 my @names;
-foreach my $name (qw/frank judy barney/) {
-    male( $name, sub { push @names => $name; } );
+foreach my $name (qw/yuki unknown adeyemi/) {
+    developer( $name, sub { push @names => $name; } );
 }
 print Dumper \@names;
-my $male = Var;
-male( $male, sub { print $male->value .' is a male'.$/ } );
+my $dev = Var;
+developer( $dev, sub { print $dev->value .' is a developer'.$/ } );
 
-my $actor = Var;
-actor( $actor, sub { print $actor->value . ' is an actor', $/ } );
+my $person = Var;
+my $project = Var;
+works_on( $person, $project, sub { 
+    print $person->value . ' works on ' . $project->value, $/ 
+} );

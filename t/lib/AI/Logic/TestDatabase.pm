@@ -1,13 +1,20 @@
 package AI::Logic::TestDatabase;
 
 use AI::Logic::Database
-    variables => [qw(Person X Y Z List Head Tail Rest Length Item)],
+    variables => [qw(Person X Y Z List Head Tail Rest Length Item Project Team Skill Role)],
     predicates => [qw(
-        male/1
-        female/1
-        married/2
-        parent/2
-        child/2
+        developer/1
+        designer/1
+        manager/1
+        works_on/2
+        team_member/2
+        mentor/2
+        collaborates/2
+        skill/2
+        project/1
+        team/1
+        team_lead/1
+        work_together/2
         Append/3
         Member/2
         Select/3
@@ -15,29 +22,94 @@ use AI::Logic::Database
         List_length/2
     )];
 
-# Regular predicates - family relationships
-male { 'frank' };
-male { 'barney' };
-male { 'timothy' };
-male { 'sam' };
+# Software development team with diverse, globally representative names
 
-female { 'sarah' };
-female { 'leila' };
-female { 'samantha' };
-female { 'betty' };
+# Roles
+developer { 'yuki' };        # Japanese
+developer { 'adeyemi' };     # Yoruba/Nigerian  
+developer { 'priya' };       # Sanskrit/Indian
+developer { 'carlos' };      # Spanish/Latin American
+developer { 'fatima' };      # Arabic
+developer { 'erik' };        # Scandinavian
+developer { 'aisha' };       # Swahili/Arabic
+developer { 'dmitri' };      # Russian
 
-married { 'frank', 'sarah' };
-married { 'barney', 'betty' };
-married { 'sam', 'samantha' };
+designer { 'kenji' };        # Japanese
+designer { 'zara' };         # Arabic/Hebrew
+designer { 'maya' };         # Sanskrit/Hebrew/Latin American
 
-parent { 'frank', 'timothy' };
-parent { 'sarah', 'timothy' };
-parent { 'barney', 'sam' };
-parent { 'betty', 'sam' };
+manager { 'amara' };         # Igbo/Sanskrit
+manager { 'hassan' };        # Arabic
+manager { 'ling' };          # Chinese
 
-# Define child relationship as inverse of parent
+# Projects
+project { 'web_app' };
+project { 'mobile_app' };
+project { 'api_service' };
+project { 'data_pipeline' };
+
+# Teams
+team { 'frontend' };
+team { 'backend' };
+team { 'design' };
+team { 'devops' };
+
+# Work relationships
+works_on { 'yuki', 'web_app' };
+works_on { 'adeyemi', 'mobile_app' };
+works_on { 'priya', 'api_service' };
+works_on { 'carlos', 'data_pipeline' };
+works_on { 'fatima', 'web_app' };
+works_on { 'erik', 'mobile_app' };
+
+# Team memberships
+team_member { 'yuki', 'frontend' };
+team_member { 'adeyemi', 'backend' };
+team_member { 'priya', 'backend' };
+team_member { 'carlos', 'devops' };
+team_member { 'kenji', 'design' };
+team_member { 'zara', 'design' };
+
+# Mentoring relationships
+mentor { 'carlos', 'yuki' };
+mentor { 'fatima', 'adeyemi' };
+mentor { 'erik', 'priya' };
+mentor { 'amara', 'kenji' };
+
+# Collaboration relationships
+collaborates { 'yuki', 'kenji' };
+collaborates { 'priya', 'adeyemi' };
+collaborates { 'fatima', 'zara' };
+collaborates { 'carlos', 'erik' };
+
+# Skills
+skill { 'yuki', 'javascript' };
+skill { 'yuki', 'react' };
+skill { 'adeyemi', 'python' };
+skill { 'adeyemi', 'django' };
+skill { 'priya', 'rust' };
+skill { 'priya', 'postgresql' };
+skill { 'carlos', 'go' };
+skill { 'carlos', 'kubernetes' };
+skill { 'fatima', 'typescript' };
+skill { 'fatima', 'vue' };
+skill { 'erik', 'swift' };
+skill { 'erik', 'ios' };
+
+# Define some useful rules
 Rule {
-    child { X, Y } => parent { Y, X };
+    # Someone is a team_lead if they mentor someone on their team
+    team_lead { Person } => 
+        mentor { Person, Mentee },
+        team_member { Person, Team },
+        team_member { Mentee, Team };
+};
+
+Rule {
+    # Two people work together if they work on the same project
+    work_together { Person1, Person2 } =>
+        works_on { Person1, Project },
+        works_on { Person2, Project };
 };
 
 # List predicates will be implemented in subsequent tasks

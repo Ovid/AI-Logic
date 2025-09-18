@@ -12,12 +12,15 @@ subtest 'Mixed predicates database setup' => sub {
     {
         package MixedDatabase;
         use AI::Logic::Database
-            variables => [qw(Person X Y Z List Head Tail Rest Length)],
+            variables => [qw(Person X Y Z List Head Tail Rest Length Project Skill)],
             predicates => [qw(
-                male/1
-                female/1
-                married/2
-                parent/2
+                developer/1
+                designer/1
+                manager/1
+                works_on/2
+                skill/2
+                team_member/2
+                mentor/2
                 Append/3
                 Member/2
                 Select/3
@@ -25,19 +28,19 @@ subtest 'Mixed predicates database setup' => sub {
                 List_length/2
             )];
         
-        # Regular predicates - family relationships
-        male { 'frank' };
-        male { 'barney' };
-        male { 'timothy' };
-        female { 'sarah' };
-        female { 'leila' };
-        female { 'samantha' };
+        # Regular predicates - team relationships
+        developer { 'yuki' };
+        developer { 'adeyemi' };
+        developer { 'priya' };
+        designer { 'kenji' };
+        designer { 'zara' };
+        manager { 'amara' };
         
-        married { 'frank', 'sarah' };
-        married { 'barney', 'leila' };
+        works_on { 'yuki', 'web_app' };
+        works_on { 'adeyemi', 'mobile_app' };
         
-        parent { 'frank', 'timothy' };
-        parent { 'sarah', 'timothy' };
+        skill { 'yuki', 'javascript' };
+        skill { 'adeyemi', 'python' };
         
         # List predicates - will be implemented in later tasks
         # For now, just verify the predicates are defined and callable
@@ -54,10 +57,11 @@ subtest 'Mixed predicates database setup' => sub {
     ok($database, 'Mixed database was created');
     
     # Test that regular predicates are defined
-    ok(exists $database->{male}, 'male predicate exists');
-    ok(exists $database->{female}, 'female predicate exists');
-    ok(exists $database->{married}, 'married predicate exists');
-    ok(exists $database->{parent}, 'parent predicate exists');
+    ok(exists $database->{developer}, 'developer predicate exists');
+    ok(exists $database->{designer}, 'designer predicate exists');
+    ok(exists $database->{manager}, 'manager predicate exists');
+    ok(exists $database->{works_on}, 'works_on predicate exists');
+    ok(exists $database->{skill}, 'skill predicate exists');
     
     # Test that list predicates are defined
     ok(exists $database->{Append}, 'Append predicate exists');
@@ -67,10 +71,11 @@ subtest 'Mixed predicates database setup' => sub {
     ok(exists $database->{List_length}, 'List_length predicate exists');
     
     # Test arity definitions
-    ok(exists $database->{male}{1}, 'male/1 arity defined');
-    ok(exists $database->{female}{1}, 'female/1 arity defined');
-    ok(exists $database->{married}{2}, 'married/2 arity defined');
-    ok(exists $database->{parent}{2}, 'parent/2 arity defined');
+    ok(exists $database->{developer}{1}, 'developer/1 arity defined');
+    ok(exists $database->{designer}{1}, 'designer/1 arity defined');
+    ok(exists $database->{manager}{1}, 'manager/1 arity defined');
+    ok(exists $database->{works_on}{2}, 'works_on/2 arity defined');
+    ok(exists $database->{skill}{2}, 'skill/2 arity defined');
     ok(exists $database->{Append}{3}, 'Append/3 arity defined');
     ok(exists $database->{Member}{2}, 'Member/2 arity defined');
     ok(exists $database->{Select}{3}, 'Select/3 arity defined');
@@ -83,35 +88,35 @@ subtest 'Regular predicates work alongside list predicate definitions' => sub {
     use AI::Logic 'MixedDatabase';
     
     # Test regular predicates work
-    my @males;
-    my $male_var = Var;
-    male($male_var, sub { push @males, $male_var->value });
-    is_deeply([sort @males], [sort qw(frank barney timothy)], 'male/1 predicate works');
+    my @developers;
+    my $dev_var = Var;
+    developer($dev_var, sub { push @developers, $dev_var->value });
+    is_deeply([sort @developers], [sort qw(yuki adeyemi priya)], 'developer/1 predicate works');
     
-    my @females;
-    my $female_var = Var;
-    female($female_var, sub { push @females, $female_var->value });
-    is_deeply([sort @females], [sort qw(sarah leila samantha)], 'female/1 predicate works');
+    my @designers;
+    my $designer_var = Var;
+    designer($designer_var, sub { push @designers, $designer_var->value });
+    is_deeply([sort @designers], [sort qw(kenji zara)], 'designer/1 predicate works');
     
-    my @couples;
-    my $husband = Var;
-    my $wife = Var;
-    married($husband, $wife, sub { 
-        push @couples, [$husband->value, $wife->value] 
+    my @assignments;
+    my $person_var = Var;
+    my $project_var = Var;
+    works_on($person_var, $project_var, sub { 
+        push @assignments, [$person_var->value, $project_var->value] 
     });
-    is_deeply([sort { $a->[0] cmp $b->[0] } @couples], 
-              [sort { $a->[0] cmp $b->[0] } (['frank', 'sarah'], ['barney', 'leila'])], 
-              'married/2 predicate works');
+    is_deeply([sort { $a->[0] cmp $b->[0] } @assignments], 
+              [sort { $a->[0] cmp $b->[0] } (['yuki', 'web_app'], ['adeyemi', 'mobile_app'])], 
+              'works_on/2 predicate works');
     
-    my @parents;
-    my $parent_var = Var;
-    my $child_var = Var;
-    parent($parent_var, $child_var, sub {
-        push @parents, [$parent_var->value, $child_var->value]
+    my @skills;
+    my $skill_person = Var;
+    my $skill_name = Var;
+    skill($skill_person, $skill_name, sub {
+        push @skills, [$skill_person->value, $skill_name->value]
     });
-    is_deeply([sort { $a->[0] cmp $b->[0] } @parents],
-              [sort { $a->[0] cmp $b->[0] } (['frank', 'timothy'], ['sarah', 'timothy'])],
-              'parent/2 predicate works');
+    is_deeply([sort { $a->[0] cmp $b->[0] } @skills],
+              [sort { $a->[0] cmp $b->[0] } (['yuki', 'javascript'], ['adeyemi', 'python'])],
+              'skill/2 predicate works');
 };
 
 subtest 'List predicates are callable but not yet implemented' => sub {

@@ -29,75 +29,109 @@ of bugs.
 
  {
      package My::Database;
-     use AI::Logic::Database variables => [ 'Person' ],
+     use AI::Logic::Database variables => [ 'Person', 'Project', 'Skill' ],
        predicates => [
          qw{
-           male/1
-           female/1
-           married/2
-           wife/1
-           insane/1
-           strange_husband/1
+           developer/1
+           designer/1
+           manager/1
+           works_on/2
+           skill/2
+           team_member/2
+           mentor/2
+           collaborates/2
+           project/1
+           team/1
+           team_lead/1
+           experienced/1
            }
        ];
-     male { 'frank' };
-     male { 'barney' };
-     male { 'timothy' };
-     male { 'ovid' };
-     male { 'Sam' };
-     female { 'Sarah' };
-     female { 'Leila' };
-     female { 'Samantha' };
-     married { 'frank', 'Sarah' };
-     married { 'Sam',   'Samantha' };
-     married { 'Bill', 'John' };
+     
+     developer { 'yuki' };
+     developer { 'adeyemi' };
+     developer { 'priya' };
+     developer { 'carlos' };
+     designer { 'kenji' };
+     designer { 'zara' };
+     manager { 'amara' };
+     manager { 'hassan' };
+     
+     # Projects
+     project { 'web_app' };
+     project { 'mobile_app' };
+     project { 'api_service' };
+     
+     # Work assignments
+     works_on { 'yuki', 'web_app' };
+     works_on { 'adeyemi', 'mobile_app' };
+     works_on { 'priya', 'api_service' };
+     works_on { 'carlos', 'web_app' };
+     
+     # Skills
+     skill { 'yuki', 'javascript' };
+     skill { 'adeyemi', 'python' };
+     skill { 'priya', 'rust' };
+     skill { 'carlos', 'go' };
+     
+     # Team memberships
+     team_member { 'yuki', 'frontend' };
+     team_member { 'carlos', 'frontend' };
+     team_member { 'adeyemi', 'backend' };
+     team_member { 'priya', 'backend' };
+     
+     # Mentoring relationships
+     mentor { 'carlos', 'yuki' };
+     mentor { 'amara', 'kenji' };
+     
+     # Someone is experienced if they mentor others
+     experienced { 'carlos' };
+     experienced { 'amara' };
  
      Rule {
-         wife { Person } => 
-           married { Any, Person },
-           female { Person };
+         team_lead { Person } => 
+           mentor { Person, Any };
      };
  }
  
  use AI::Logic 'My::Database';
  
- # Are any of these names known males?
+ # Are any of these names known developers?
  my @names;
- foreach my $name (qw/frank judy barney/) {
-     male( $name, sub { push @names => $name; } );
+ foreach my $name (qw/yuki unknown adeyemi/) {
+     developer( $name, sub { push @names => $name; } );
  }
- # @names will contain 'frank' and 'barney'
+ # @names will contain 'yuki' and 'adeyemi'
  
- my $male = Var;
+ my $dev = Var;
  @names = ();
- male( $male, sub { push @names => $male->value } );
- # @names will contain all known males
+ developer( $dev, sub { push @names => $dev->value } );
+ # @names will contain all known developers
  
- # who is frank married to?
- my $husband = Var 'frank';
- my $wife    = Var;
- married(
-     $husband, $wife,
+ # what project does yuki work on?
+ my $person = Var 'yuki';
+ my $project = Var;
+ works_on(
+     $person, $project,
      sub {
-         print 'frank is married to '.$wife->value."\n";
+         print 'yuki works on '.$project->value."\n";
      }
  );
  
- # print all married couples
- $husband->unbind;
- $wife->unbind;
- my @spouses;
- married(
-     $husband, $wife,
+ # print all work assignments
+ $person->unbind;
+ $project->unbind;
+ my @assignments;
+ works_on(
+     $person, $project,
      sub {
-         print $husband->value .' is married to '.$wife->value."\n";
+         print $person->value .' works on '.$project->value."\n";
      }
  );
  
- my $var = Var 'Sarah';
- my $is_wife;
- wife( $var, sub { $is_wife = 1 });
- if ( $is_wife ) {
+ my $var = Var 'carlos';
+ my $is_team_lead;
+ team_lead( $var, sub { $is_team_lead = 1 });
+ if ( $is_team_lead ) {
      print "Yes\n";
  }
  else {
@@ -106,29 +140,29 @@ of bugs.
  
  # You can create rules on the fly, but it's not fun and they'll conflict with
  # other rules of the same name.
- sub strange_husband {
+ sub experienced_mentor {
      my ($person, $continuation) = @_;
-     insane(
+     experienced(
          $person,
          sub {
-             married(
+             mentor(
                  $person, Any,
                  sub {
-                     male( $person, $continuation );
+                     developer( $person, $continuation );
                  }
              );
          }
      );
  }
- $husband = Var;
- strange_husband($husband, sub { print $husband->value });
+ my $mentor_var = Var;
+ experienced_mentor($mentor_var, sub { print $mentor_var->value });
  # equivalent to the following declaration in a database:
  
  Rule {
-     strange_husband { Person } =>
-         insane { Person },
-         married { Person, Any },
-         male { Person },
+     experienced_mentor { Person } =>
+         experienced { Person },
+         mentor { Person, Any },
+         developer { Person },
  }
 
 =head1 EXPORT
