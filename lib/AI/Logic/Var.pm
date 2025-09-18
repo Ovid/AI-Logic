@@ -49,7 +49,7 @@ To be defined later
 
 =item * C<unbind>
 
-=item * C<equal>
+=item * C<equals>
 
 =item * C<is_bound>
 
@@ -116,7 +116,7 @@ sub is_bound { defined $_[0]->[0] }
 
 sub value { return $_[0]->[0] }
 
-sub equal {
+sub equals {
     my ( $v1, $v2 ) = @_;
     $v1 eq $v2 || $v1->is_bound && $v2->is_bound && $v1->value eq $v2->value;
 }

@@ -66,7 +66,7 @@ sub unify {
     $v1 = Var $v1 unless UNIVERSAL::isa( $v1, 'AI::Logic::Var' );
     $v2 = Var $v2 unless UNIVERSAL::isa( $v2, 'AI::Logic::Var' );
     
-    if ( $v1->equal($v2) ) {
+    if ( $v1->equals($v2) ) {
         $continuation->();
     }
     elsif ( $v1->bind($v2) ) {

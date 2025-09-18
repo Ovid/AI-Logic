@@ -20,9 +20,9 @@ isa_ok $v2, 'AI::Logic::Var', 'new bound var';
 ok $v2->is_bound, '  is bound';
 is $v2->value, "hello", '  to correct value';
 
-ok $v1->equal($v1), 'var equal to itself';
-ok !$v1->equal($v3), 'unbound var not equal to other unbound var';
-ok $v2->equal($v4), 'bound vars with same content equal';
+ok $v1->equals($v1), 'var equal to itself';
+ok !$v1->equals($v3), 'unbound var not equal to other unbound var';
+ok $v2->equals($v4), 'bound vars with same content equal';
 
 ok !$v2->bind($v1), 'cannot bind bound var';
 ok $v1->bind($v2), 'can bind unbound var';
