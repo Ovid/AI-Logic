@@ -1,7 +1,6 @@
 package AI::Logic::Builtins;
 
-use strict;
-use warnings;
+use v5.40.0;
 
 use AI::Logic::List;
 use AI::Logic::Var 'Var';

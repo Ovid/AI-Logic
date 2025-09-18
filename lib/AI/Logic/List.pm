@@ -1,7 +1,6 @@
 package AI::Logic::List;
 
-use strict;
-use warnings;
+use v5.40.0;
 
 our $VERSION = '0.01';
 

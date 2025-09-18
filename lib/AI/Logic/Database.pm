@@ -1,7 +1,6 @@
 package AI::Logic::Database;
 
-use warnings;
-use strict;
+use v5.40.0;
 
 use Carp 'croak';
 use Scalar::Util;
@@ -114,7 +113,7 @@ sub import {
 #         sub { female( $Person, $continuation ) }
 #     );
 # }
-sub Rule(&) {
+sub Rule :prototype(&) {
     local $ENV{CREATING_RULE} = 1;
     my @rules = shift->() or return;
 
@@ -122,6 +121,8 @@ sub Rule(&) {
         croak "Rules must have both a head and a tail";
     }
 
+    # XXX $database is unused. Investigate.
+    # # XXX $database is unused. Investigate.
     my ( $database, $name, @args ) = @{ pop @rules };
     my @variables = _make_arg_list(@args);
     local $" = ', ';
@@ -164,13 +165,13 @@ sub _make_arg_list {
     my @args = @_;
     my @variables;
     foreach my $arg (@args) {
-        if ( UNIVERSAL::isa( $arg, 'AI::Logic::Var::Any' ) ) {
+        if ( $arg isa 'AI::Logic::Var::Any' ) {
             push @variables => '{PACKAGE}::Any()';
         }
-        elsif ( UNIVERSAL::isa( $arg, 'AI::Logic::Var::Named' ) ) {
+        elsif ( $arg isa 'AI::Logic::Var::Named' ) {
             push @variables => '$' . $arg->name;
         }
-        elsif ( UNIVERSAL::isa( $arg, 'AI::Logic::List' ) ) {
+        elsif ( $arg isa 'AI::Logic::List' ) {
             push @variables => _serialize_list($arg);
         }
         elsif ( ref($arg) eq 'ARRAY' ) {
@@ -196,13 +197,13 @@ sub _serialize_list {
     
     # Serialize head
     my $head_str;
-    if ( UNIVERSAL::isa( $head, 'AI::Logic::Var::Any' ) ) {
+    if ( $head isa 'AI::Logic::Var::Any' ) {
         $head_str = '{PACKAGE}::Any()';
     }
-    elsif ( UNIVERSAL::isa( $head, 'AI::Logic::Var::Named' ) ) {
+    elsif ( $head isa 'AI::Logic::Var::Named' ) {
         $head_str = '{PACKAGE}::' . $head->name;
     }
-    elsif ( UNIVERSAL::isa( $head, 'AI::Logic::List' ) ) {
+    elsif ( $head isa 'AI::Logic::List' ) {
         $head_str = _serialize_list($head);
     }
     else {
@@ -230,13 +231,13 @@ sub _parse_list_syntax {
         my $head = $array_ref->[0];
         my $head_str;
         
-        if ( UNIVERSAL::isa( $head, 'AI::Logic::Var::Any' ) ) {
+        if ( $head isa 'AI::Logic::Var::Any' ) {
             $head_str = '{PACKAGE}::Any()';
         }
-        elsif ( UNIVERSAL::isa( $head, 'AI::Logic::Var::Named' ) ) {
+        elsif ( $head isa 'AI::Logic::Var::Named' ) {
             $head_str = '{PACKAGE}::' . $head->name;
         }
-        elsif ( UNIVERSAL::isa( $head, 'AI::Logic::List' ) ) {
+        elsif ( $head isa 'AI::Logic::List' ) {
             $head_str = _serialize_list($head);
         }
         else {
@@ -257,13 +258,13 @@ sub _parse_list_syntax {
         my $element = $array_ref->[$i];
         my $element_str;
         
-        if ( UNIVERSAL::isa( $element, 'AI::Logic::Var::Any' ) ) {
+        if ( $element isa 'AI::Logic::Var::Any' ) {
             $element_str = '{PACKAGE}::Any()';
         }
-        elsif ( UNIVERSAL::isa( $element, 'AI::Logic::Var::Named' ) ) {
+        elsif ( $element isa 'AI::Logic::Var::Named' ) {
             $element_str = '{PACKAGE}::' . $element->name;
         }
-        elsif ( UNIVERSAL::isa( $element, 'AI::Logic::List' ) ) {
+        elsif ( $element isa 'AI::Logic::List' ) {
             $element_str = _serialize_list($element);
         }
         elsif ( ref($element) eq 'ARRAY' ) {
@@ -341,7 +342,7 @@ handle adding facts to the database;
 
 sub _add_to_database {
     my ( $database, $name ) = @_;
-    return sub (&) {
+    return sub :prototype(&) {
         if ( $ENV{CREATING_RULE} ) {
             return _add_rule_to_database( $database, $name, shift );
         }

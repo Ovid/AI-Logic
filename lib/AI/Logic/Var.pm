@@ -1,7 +1,7 @@
 package AI::Logic::Var;
 
-use warnings;
-use strict;
+use v5.40.0;
+no feature 'signatures';
 use AI::Logic::List;
 
 use base 'Exporter';

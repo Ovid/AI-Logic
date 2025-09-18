@@ -1,7 +1,6 @@
 package AI::Logic::Unification;
 
-use warnings;
-use strict;
+use v5.40.0;
 
 use AI::Logic::Var 'Var';
 
@@ -45,7 +44,7 @@ sub unify {
     }
 
     # Handle variable-to-list binding
-    if (UNIVERSAL::isa($v1, 'AI::Logic::Var') && _is_list($v2)) {
+    if ($v1 isa 'AI::Logic::Var' && _is_list($v2)) {
         if (!$v1->is_bound) {
             $v1->[0] = $v2;  # Bind variable directly to list
             $continuation->();
@@ -54,7 +53,7 @@ sub unify {
         }
     }
     
-    if (UNIVERSAL::isa($v2, 'AI::Logic::Var') && _is_list($v1)) {
+    if ($v2 isa 'AI::Logic::Var' && _is_list($v1)) {
         if (!$v2->is_bound) {
             $v2->[0] = $v1;  # Bind variable directly to list
             $continuation->();
@@ -63,8 +62,8 @@ sub unify {
         }
     }
 
-    $v1 = Var $v1 unless UNIVERSAL::isa( $v1, 'AI::Logic::Var' );
-    $v2 = Var $v2 unless UNIVERSAL::isa( $v2, 'AI::Logic::Var' );
+    $v1 = Var $v1 unless $v1 isa 'AI::Logic::Var';
+    $v2 = Var $v2 unless $v2 isa 'AI::Logic::Var';
     
     if ( $v1->equals($v2) ) {
         $continuation->();
@@ -109,7 +108,7 @@ Helper function to check if a value is a list object.
 
 sub _is_list {
     my ($value) = @_;
-    return UNIVERSAL::isa($value, 'AI::Logic::List');
+    return $value isa 'AI::Logic::List';
 }
 
 =head2 _both_lists
