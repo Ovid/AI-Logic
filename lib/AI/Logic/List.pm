@@ -46,10 +46,12 @@ an empty list. Called with head and tail creates a non-empty list.
 
 =cut
 
+my $EMPTY_LIST = bless { head => undef, tail => undef }, __PACKAGE__;
+
 sub new ($class, $head = undef, $tail = undef) {
     # Empty list if no head provided
-    if (!defined $head) {
-        return bless { head => undef, tail => undef }, $class;
+    if (!defined $head && !defined $tail) {
+        return $EMPTY_LIST;
     }
     
     # Non-empty list with head and tail

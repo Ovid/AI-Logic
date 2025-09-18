@@ -25,6 +25,16 @@ subtest 'Non-empty list construction' => sub {
     ok($list->tail()->is_empty(), 'Single element list has empty tail');
 };
 
+subtest 'Non-empty list construction but with undefined head' => sub {
+    my $tail_list = AI::Logic::List->new();
+    my $list = AI::Logic::List->new(undef, $tail_list);
+    isa_ok($list, 'AI::Logic::List', 'Non-empty list constructor returns correct type');
+    ok(!$list->is_empty(), 'Non-empty list is_empty() returns false');
+    ok (! defined $list->head(), 'Non-empty list head() returns correct value');
+    isa_ok($list->tail(), 'AI::Logic::List', 'Non-empty list tail() returns List object');
+    ok($list->tail()->is_empty(), 'Single element list has empty tail');
+};
+
 subtest 'cons() class method with tail' => sub {
     my $empty = AI::Logic::List->new();
     my $cons_list = AI::Logic::List->cons('x', $empty);
