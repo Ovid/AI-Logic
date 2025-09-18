@@ -103,9 +103,9 @@ subtest 'List predicates are callable but not implemented' => sub {
     ok(!$@, 'Empty_list/1 call does not crash');
     
     eval {
-        Length(Var([1, 2, 3]), Var(3), sub { $success_count++ });
+        List_length(Var([1, 2, 3]), Var(3), sub { $success_count++ });
     };
-    ok(!$@, 'Length/2 call does not crash');
+    ok(!$@, 'List_length/2 call does not crash');
     
     # Since no rules are implemented, success_count should be 0
     is($success_count, 0, 'List predicates do not succeed (no rules implemented yet)');
@@ -140,7 +140,7 @@ subtest 'Mixed variable types work together' => sub {
     isa_ok($unbound_var, 'AI::Logic::Var', 'Unbound variable created correctly');
     
     is($bound_var->value(), 'test', 'Bound variable has correct value');
-    ok(!$unbound_var->bound(), 'Unbound variable is not bound');
+    ok(!$unbound_var->is_bound(), 'Unbound variable is not bound');
 };
 
 subtest 'Database supports both regular and list predicate queries' => sub {

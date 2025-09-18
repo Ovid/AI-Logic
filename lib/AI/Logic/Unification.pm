@@ -46,7 +46,7 @@ sub unify {
 
     # Handle variable-to-list binding
     if (UNIVERSAL::isa($v1, 'AI::Logic::Var') && _is_list($v2)) {
-        if (!$v1->bound) {
+        if (!$v1->is_bound) {
             $v1->[0] = $v2;  # Bind variable directly to list
             $continuation->();
             $v1->unbind;
@@ -55,7 +55,7 @@ sub unify {
     }
     
     if (UNIVERSAL::isa($v2, 'AI::Logic::Var') && _is_list($v1)) {
-        if (!$v2->bound) {
+        if (!$v2->is_bound) {
             $v2->[0] = $v1;  # Bind variable directly to list
             $continuation->();
             $v2->unbind;

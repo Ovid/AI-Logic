@@ -22,7 +22,7 @@ subtest 'Mixed predicates database setup' => sub {
                 Member/2
                 Select/3
                 Empty_list/1
-                Length/2
+                List_length/2
             )];
         
         # Regular predicates - family relationships
@@ -64,7 +64,7 @@ subtest 'Mixed predicates database setup' => sub {
     ok(exists $database->{Member}, 'Member predicate exists');
     ok(exists $database->{Select}, 'Select predicate exists');
     ok(exists $database->{Empty_list}, 'Empty_list predicate exists');
-    ok(exists $database->{Length}, 'Length predicate exists');
+    ok(exists $database->{List_length}, 'List_length predicate exists');
     
     # Test arity definitions
     ok(exists $database->{male}{1}, 'male/1 arity defined');
@@ -75,7 +75,7 @@ subtest 'Mixed predicates database setup' => sub {
     ok(exists $database->{Member}{2}, 'Member/2 arity defined');
     ok(exists $database->{Select}{3}, 'Select/3 arity defined');
     ok(exists $database->{Empty_list}{1}, 'Empty_list/1 arity defined');
-    ok(exists $database->{Length}{2}, 'Length/2 arity defined');
+    ok(exists $database->{List_length}{2}, 'List_length/2 arity defined');
 };
 
 subtest 'Regular predicates work alongside list predicate definitions' => sub {
@@ -146,9 +146,9 @@ subtest 'List predicates are callable but not yet implemented' => sub {
     ok(!$@, 'Empty_list/1 can be called without crashing');
     
     eval {
-        Length(Var([1, 2, 3]), Var(3), sub { $called_length = 1 });
+        List_length(Var([1, 2, 3]), Var(3), sub { $called_length = 1 });
     };
-    ok(!$@, 'Length/2 can be called without crashing');
+    ok(!$@, 'List_length/2 can be called without crashing');
 };
 
 subtest 'Mixed database supports both regular and list variables' => sub {

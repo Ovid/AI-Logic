@@ -15,7 +15,7 @@ subtest 'Test database creation and basic functionality' => sub {
     
     # Test that all expected predicates are defined
     my @regular_predicates = qw(male female married parent child);
-    my @list_predicates = qw(Append Member Select Empty_list Length);
+    my @list_predicates = qw(Append Member Select Empty_list List_length);
     
     for my $predicate (@regular_predicates) {
         ok(exists $database->{$predicate}, "$predicate predicate exists");
@@ -35,7 +35,7 @@ subtest 'Test database creation and basic functionality' => sub {
     ok(exists $database->{Member}{2}, 'Member/2 arity exists');
     ok(exists $database->{Select}{3}, 'Select/3 arity exists');
     ok(exists $database->{Empty_list}{1}, 'Empty_list/1 arity exists');
-    ok(exists $database->{Length}{2}, 'Length/2 arity exists');
+    ok(exists $database->{List_length}{2}, 'List_length/2 arity exists');
 };
 
 subtest 'Test database facts and rules' => sub {
@@ -55,7 +55,7 @@ subtest 'Test database facts and rules' => sub {
     is(@{$database->{Member}{2}{fact_or_rule}}, 0, 'Member/2 has no facts/rules yet');
     is(@{$database->{Select}{3}{fact_or_rule}}, 0, 'Select/3 has no facts/rules yet');
     is(@{$database->{Empty_list}{1}{fact_or_rule}}, 0, 'Empty_list/1 has no facts/rules yet');
-    is(@{$database->{Length}{2}{fact_or_rule}}, 0, 'Length/2 has no facts/rules yet');
+    is(@{$database->{List_length}{2}{fact_or_rule}}, 0, 'List_length/2 has no facts/rules yet');
 };
 
 subtest 'Test mixed predicates can coexist' => sub {

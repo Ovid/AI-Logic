@@ -13,11 +13,11 @@ my $v3 = Var;
 my $v4 = Var "hello";
 
 isa_ok $v1, 'AI::Logic::Var', 'new unbound var';
-ok !$v1->bound, '  is not bound';
+ok !$v1->is_bound, '  is not bound';
 is $v1->value, undef, '  and undefined';
 
 isa_ok $v2, 'AI::Logic::Var', 'new bound var';
-ok $v2->bound, '  is bound';
+ok $v2->is_bound, '  is bound';
 is $v2->value, "hello", '  to correct value';
 
 ok $v1->equal($v1), 'var equal to itself';

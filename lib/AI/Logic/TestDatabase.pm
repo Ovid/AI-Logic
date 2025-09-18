@@ -12,7 +12,7 @@ use AI::Logic::Database
         Member/2
         Select/3
         Empty_list/1
-        Length/2
+        List_length/2
     )];
 
 # Regular predicates - family relationships

@@ -80,14 +80,14 @@ subtest 'List unification with variables' => sub {
     
     unify($var, $list, sub { 
         $unified = 1;
-        $was_bound = $var->bound();
-        $bound_value = $var->value() if $var->bound();
+        $was_bound = $var->is_bound();
+        $bound_value = $var->value() if $var->is_bound();
     });
     
     ok($unified, 'Variable unifies with list');
     ok($was_bound, 'Variable becomes bound during unification');
     isa_ok($bound_value, 'AI::Logic::List', 'Variable bound to list object');
-    ok(!$var->bound(), 'Variable is unbound after unification completes');
+    ok(!$var->is_bound(), 'Variable is unbound after unification completes');
 };
 
 subtest 'List head/tail variable unification' => sub {
@@ -106,10 +106,10 @@ subtest 'List head/tail variable unification' => sub {
     
     unify($var_list, $concrete_list, sub { 
         $unified = 1;
-        $head_was_bound = $head_var->bound();
-        $tail_was_bound = $tail_var->bound();
-        $head_bound_value = $head_var->value() if $head_var->bound();
-        $tail_bound_value = $tail_var->value() if $tail_var->bound();
+        $head_was_bound = $head_var->is_bound();
+        $tail_was_bound = $tail_var->is_bound();
+        $head_bound_value = $head_var->value() if $head_var->is_bound();
+        $tail_bound_value = $tail_var->value() if $tail_var->is_bound();
     });
     
     ok($unified, 'List with variable head/tail unifies with concrete list');

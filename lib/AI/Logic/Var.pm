@@ -123,7 +123,7 @@ sub equal {
 
 sub bind {
     my ( $v1, $v2 ) = @_;
-    return if $v1->bound;
+    return if $v1->is_bound;
     $v1->[0] = $v2->[0];
     return 1;
 }
