@@ -8,6 +8,7 @@ use Test::Most;
 use lib 'lib';
 
 # Load the test database module first to create the database
+use lib 't/lib';
 use AI::Logic::TestDatabase;
 
 # Import the test database to use its predicates

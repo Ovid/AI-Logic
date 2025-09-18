@@ -6,6 +6,7 @@ use Test::Most;
 
 # Load modules
 use lib 'lib';
+use lib 't/lib';
 use AI::Logic::TestDatabase;  # This loads and creates the database
 
 subtest 'Test database creation and basic functionality' => sub {
